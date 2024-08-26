@@ -1,0 +1,33 @@
+{
+  "name": "pontus-node-jdbc",
+  "version": "1.0.0",
+  "description": "A TypeScript wrapper for JDBC connections to work with TypeScript applications",
+  "main": "dist/index.js", 
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepublishOnly": "npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pontus-vision/pontus-node-jdbc.git"
+  },
+  "keywords": [
+    "JDBC",
+    "TypeScript",
+    "database",
+    "SQL"
+  ],
+  "author": "Leo Martins",
+  "license": "MIT",
+  "dependencies": {
+    "lodash": "^4.17.21",
+    "winston": "^3.3.3"
+    // Add other necessary dependencies
+  },
+  "devDependencies": {
+    "typescript": "^5.x",
+    "@types/node": "^18.x"
+  }
+}
