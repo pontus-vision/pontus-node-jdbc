@@ -1,6 +1,8 @@
+/* jshint node: true */
+"use strict";
+
 import _ from 'lodash';
-import asyncjs from 'async';
-import uuid from 'uuid';
+import { v4 as uuidv4 } from 'uuid';
 import jinst from "./jinst";
 import dm from './drivermanager';
 import Connection from './connection';
@@ -12,75 +14,67 @@ if (!jinst.isJvmCreated()) {
   jinst.addOption("-Xrs");
 }
 
-const keepalive = async (conn: any, query: string) => {
-  try {
-    const statement = await conn.createStatement();
-    await statement.execute(query);
-    winston.silly("%s - Keep-Alive", new Date().toUTCString());
-  } catch (err) {
-    winston.error(err);
-  }
-};
+async function keepalive(conn: any, query: string) {
+  const statement = await conn.createStatement();
+  await statement.execute(query);
+  winston.silly("%s - Keep-Alive", new Date().toUTCString());
+}
 
-const addConnection = async (url: string, props: any, ka: any, maxIdle: number | null, callback: (err: Error | null, conn: any) => void) => {
+async function addConnection(url: string, props: any, ka: any, maxIdle: any): Promise<any> {
   try {
     const conn = await dm.getConnection(url, props);
-    const connobj = {
-      uuid: uuid.v4(),
+    const connObj = {
+      uuid: uuidv4(),
       conn: new Connection(conn),
-      keepalive: ka.enabled ? setInterval(keepalive, ka.interval, conn, ka.query) : false
+      keepalive: ka.enabled ? setInterval(() => keepalive(conn, ka.query), ka.interval) : false
     };
 
     if (maxIdle) {
-      connobj.lastIdle = new Date().getTime();
+      connObj.lastIdle = new Date().getTime();
     }
 
-    callback(null, connobj);
+    return connObj;
   } catch (err) {
-    callback(err);
+    throw err;
   }
-};
+}
 
-const addConnectionSync = (url: string, props: any, ka: any, maxIdle: number | null) => {
+function addConnectionSync(url: string, props: any, ka: any, maxIdle: any): any {
   const conn = dm.getConnectionSync(url, props);
-  const connobj = {
-    uuid: uuid.v4(),
+  const connObj = {
+    uuid: uuidv4(),
     conn: new Connection(conn),
-    keepalive: ka.enabled ? setInterval(keepalive, ka.interval, conn, ka.query) : false
+    keepalive: ka.enabled ? setInterval(() => keepalive(conn, ka.query), ka.interval) : false
   };
 
   if (maxIdle) {
-    connobj.lastIdle = new Date().getTime();
+    connObj.lastIdle = new Date().getTime();
   }
 
-  return connobj;
-};
+  return connObj;
+}
 
 class Pool {
-  _url: string;
-  _props: any;
-  _drivername: string;
-  _minpoolsize: number;
-  _maxpoolsize: number;
-  _keepalive: any;
-  _maxidle: number | null;
-  _logging: any;
-  _pool: any[];
-  _reserved: any[];
+  private _url: string;
+  private _props: any;
+  private _drivername: string;
+  private _minpoolsize: number;
+  private _maxpoolsize: number;
+  private _keepalive: any;
+  private _maxidle: number | null;
+  private _logging: any;
+  private _pool: any[];
+  private _reserved: any[];
 
   constructor(config: any) {
     this._url = config.url;
-    this._props = (function (config: any) {
+    this._props = (() => {
       const Properties = java.import('java.util.Properties');
       const properties = new Properties();
 
-      for(const name in config.properties) {
+      for (const name in config.properties) {
         properties.putSync(name, config.properties[name]);
       }
-
-      // NOTE: https://docs.oracle.com/javase/7/docs/api/java/util/Properties.html#getProperty(java.lang.String)
-      // if property does not exist it returns 'null' in the new java version, so we can use _.isNil to support
-      // older versions as well
 
       if (config.user && _.isNil(properties.getPropertySync('user'))) {
         properties.putSync('user', config.user);
@@ -92,6 +86,7 @@ class Pool {
 
       return properties;
     })(config);
+
     this._drivername = config.drivername ? config.drivername : '';
     this._minpoolsize = config.minpoolsize ? config.minpoolsize : 1;
     this._maxpoolsize = config.maxpoolsize ? config.maxpoolsize : 1;
@@ -108,165 +103,133 @@ class Pool {
     this._reserved = [];
   }
 
-  static connStatus(acc: any[], pool: any[]) {
-    return _.reduce(pool, (conns: any[], connobj: any) => {
-      const conn = connobj.conn;
-      const closed = conn.isClosedSync();
-      const readonly = conn.isReadOnlySync();
-      const valid = conn.isValidSync(1000);
+  private connStatus(acc: any, pool: any[]): any {
+    return _.reduce(pool, (conns, connObj) => {
+      const conn = connObj.conn;
       conns.push({
-        uuid: connobj.uuid,
-        closed: closed,
-        readonly: readonly,
-        valid: valid
+        uuid: connObj.uuid,
+        closed: conn.isClosedSync(),
+        readonly: conn.isReadOnlySync(),
+        valid: conn.isValidSync(1000)
       });
       return conns;
     }, acc);
   }
 
-  status(callback: (err: Error | null, status: any) => void) {
-    const self = this;
-    const status = {};
-    status.available = self._pool.length;
-    status.reserved = self._reserved.length;
-    status.pool = Pool.connStatus([], self._pool);
-    status.rpool = Pool.connStatus([], self._reserved);
-    callback(null, status);
+  async status(): Promise<any> {
+    const status = {
+      available: this._pool.length,
+      reserved: this._reserved.length,
+      pool: this.connStatus([], this._pool),
+      rpool: this.connStatus([], this._reserved)
+    };
+
+    return status;
   }
 
-  async _addConnectionsOnInitialize(callback: (err: Error | null) => void) {
-    try {
-      const conns = await Promise.all(Array.from({ length: this._minpoolsize }, (_, index) => 
-        addConnection(this._url, this._props, this._keepalive, this._maxidle, (err: Error | null, conn: any) => {
-          if (err) {
-            callback(err);
-          } else {
-            this._pool.push(conn);
-            callback(null);
-          }
-        })
-      ));
-    } catch (err) {
-      callback(err);
-    }
+  private async _addConnectionsOnInitialize(): Promise<void> {
+    const conns = await Promise.all(
+      Array.from({ length: this._minpoolsize }, () => addConnection(this._url, this._props, this._keepalive, this._maxidle))
+    );
+    
+    _.each(conns, (conn) => {
+      this._pool.push(conn);
+    });
   }
 
-  async initialize(callback: (err: Error | null) => void) {
-    const self = this;
-
+  async initialize(): Promise<void> {
     winston.level = this._logging.level;
 
-    // If a drivername is supplied, initialize the via the old method,
-    // Class.forName()
     if (this._drivername) {
-      try {
-        const driver = await java.newInstance(this._drivername);
-        await dm.registerDriver(driver);
-        await self._addConnectionsOnInitialize(callback);
-      } catch (err) {
-        callback(err);
-      }
-    }
-    else {
-      await self._addConnectionsOnInitialize(callback);
+      const driver = await java.newInstance(this._drivername);
+      await dm.registerDriver(driver);
+      await this._addConnectionsOnInitialize();
+    } else {
+      await this._addConnectionsOnInitialize();
     }
 
     jinst.events.emit('initialized');
   }
 
-  async reserve(callback: (err: Error | null, conn: any) => void) {
-    const self = this;
-    let conn = null;
-    await self._closeIdleConnections();
+  async reserve(): Promise<any> {
+    this._closeIdleConnections();
+    let conn: any = null;
 
-    if (self._pool.length > 0 ) {
-      conn = self._pool.shift();
+    if (this._pool.length > 0) {
+      conn = this._pool.shift();
 
       if (conn.lastIdle) {
         conn.lastIdle = new Date().getTime();
       }
 
-      self._reserved.unshift(conn);
-    } else if (self._reserved.length < self._maxpoolsize) {
+      this._reserved.unshift(conn);
+    } else if (this._reserved.length < this._maxpoolsize) {
       try {
-        conn = addConnectionSync(self._url, self._props, self._keepalive, self._maxidle);
-        self._reserved.unshift(conn);
+        conn = addConnectionSync(this._url, this._props, this._keepalive, this._maxidle);
+        this._reserved.unshift(conn);
       } catch (err) {
         winston.error(err);
-        conn = null;
-        return callback(err);
+        throw err;
       }
     }
 
-    if (conn === null) {
-      callback(new Error("No more pool connections available"));
-    } else {
-      callback(null, conn);
+    if (!conn) {
+      throw new Error("No more pool connections available");
     }
+
+    return conn;
   }
 
-  _closeIdleConnections() {
-    if (! this._maxidle) {
+  private _closeIdleConnections(): void {
+    if (!this._maxidle) {
       return;
     }
 
-    const self = this;
-
-    closeIdleConnectionsInArray(self._pool, this._maxidle);
-    closeIdleConnectionsInArray(self._reserved, this._maxidle);
+    this._closeIdleConnectionsInArray(this._pool, this._maxidle);
+    this._closeIdleConnectionsInArray(this._reserved, this._maxidle);
   }
 
-  release(conn: any, callback: (err: Error | null) => void) {
-    const self = this;
+  private _closeIdleConnectionsInArray(array: any[], maxIdle: number): void {
+    const time = new Date().getTime();
+    const maxLastIdle = time - maxIdle;
+
+    for (let i = array.length - 1; i >= 0; i--) {
+      const conn = array[i];
+      if (typeof conn === 'object' && conn.conn !== null) {
+        if (conn.lastIdle < maxLastIdle) {
+          conn.conn.close(() => { });
+          array.splice(i, 1);
+        }
+      }
+    }
+  }
+
+  async release(conn: any): Promise<void> {
     if (typeof conn === 'object') {
       const uuid = conn.uuid;
-      self._reserved = _.reject(self._reserved, function(conn) {
-        return conn.uuid === uuid;
-      });
+      this._reserved = _.reject(this._reserved, (c) => c.uuid === uuid);
 
       if (conn.lastIdle) {
         conn.lastIdle = new Date().getTime();
       }
 
-      self._pool.unshift(conn);
-      return callback(null);
+      this._pool.unshift(conn);
     } else {
-      return callback(new Error("INVALID CONNECTION"));
+      throw new Error("INVALID CONNECTION");
     }
   }
 
-  async purge(callback: (err: Error | null) => void) {
-    const self = this;
-    const conns = self._pool.concat(self._reserved);
+  async purge(): Promise<void> {
+    const conns = this._pool.concat(this._reserved);
 
-    try {
-      await Promise.all(conns.map(conn => {
-        if (typeof conn === 'object' && conn.conn !== null) {
-          return conn.conn.close();
-        }
-      }));
-      self._pool = [];
-      self._reserved = [];
-
-      callback(null);
-    } catch (err) {
-      callback(err);
-    }
-  }
-}
-
-function closeIdleConnectionsInArray(array: any[], maxIdle: number) {
-  const time = new Date().getTime();
-  const maxLastIdle = time - maxIdle;
-
-  for (let i = array.length - 1; i >= 0; i--) {
-    const conn = array[i];
-    if (typeof conn === 'object' && conn.conn !== null) {
-      if (conn.lastIdle < maxLastIdle) {
-        conn.conn.close();
-        array.splice(i, 1);
+    await Promise.all(conns.map(async (conn) => {
+      if (typeof conn === 'object' && conn.conn !== null) {
+        await conn.conn.close();
       }
-    }
+    }));
+
+    this._pool = [];
+    this._reserved = [];
   }
 }
 
