@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { jinst } from "./jinst";
+import  jinst  from "./jinst";
 
 const java = jinst.getInstance();
 

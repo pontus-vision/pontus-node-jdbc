@@ -1,7 +1,7 @@
 import _ from 'lodash';
-import { ResultSet } from './resultset';
+import  ResultSet  from './resultset';
 import { Connection } from './connection';
-import { jinst } from './jinst';
+import  jinst  from './jinst';
 
 const java = jinst.getInstance();
 

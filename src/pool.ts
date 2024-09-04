@@ -5,7 +5,7 @@ import _ from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
 import jinst from "./jinst";
 import dm from './drivermanager';
-import Connection from './connection';
+import {Connection }from './connection';
 import winston from 'winston';
 
 const java = jinst.getInstance();

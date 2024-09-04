@@ -1,4 +1,4 @@
-export { default as Connection } from './connection';
+export {  Connection } from './connection';
 export { default as DriverManager } from './drivermanager';
 export { default as Jinst } from './jinst';
 export { default as Pool } from './pool';

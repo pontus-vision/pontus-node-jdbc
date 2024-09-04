@@ -1,10 +1,10 @@
-import _ from 'lodash';
-import { jinst } from './jinst';
-import { CallableStatement } from './callablestatement';
-import { PreparedStatement } from './preparedstatement';
-import { DatabaseMetaData } from './databasemetadata';
-import { Statement } from './statement';
-import { SQLWarning } from './sqlwarning';
+import _ from "lodash";
+import jinst from "./jinst";
+import { CallableStatement } from "./callablestatement";
+import PreparedStatement from "./preparedstatement";
+import { DatabaseMetaData } from "./databasemetadata";
+import Statement from "./statement";
+import SQLWarning from "./sqlwarning";
 
 const java = jinst.getInstance();
 
@@ -21,11 +21,33 @@ export class Connection {
     this._txniso = (() => {
       const txniso: string[] = [];
 
-      txniso[java.getStaticFieldValue("java.sql.Connection", "TRANSACTION_NONE")] = "TRANSACTION_NONE";
-      txniso[java.getStaticFieldValue("java.sql.Connection", "TRANSACTION_READ_COMMITTED")] = "TRANSACTION_READ_COMMITTED";
-      txniso[java.getStaticFieldValue("java.sql.Connection", "TRANSACTION_READ_UNCOMMITTED")] = "TRANSACTION_READ_UNCOMMITTED";
-      txniso[java.getStaticFieldValue("java.sql.Connection", "TRANSACTION_REPEATABLE_READ")] = "TRANSACTION_REPEATABLE_READ";
-      txniso[java.getStaticFieldValue("java.sql.Connection", "TRANSACTION_SERIALIZABLE")] = "TRANSACTION_SERIALIZABLE";
+      txniso[
+        java.getStaticFieldValue("java.sql.Connection", "TRANSACTION_NONE")
+      ] = "TRANSACTION_NONE";
+      txniso[
+        java.getStaticFieldValue(
+          "java.sql.Connection",
+          "TRANSACTION_READ_COMMITTED"
+        )
+      ] = "TRANSACTION_READ_COMMITTED";
+      txniso[
+        java.getStaticFieldValue(
+          "java.sql.Connection",
+          "TRANSACTION_READ_UNCOMMITTED"
+        )
+      ] = "TRANSACTION_READ_UNCOMMITTED";
+      txniso[
+        java.getStaticFieldValue(
+          "java.sql.Connection",
+          "TRANSACTION_REPEATABLE_READ"
+        )
+      ] = "TRANSACTION_REPEATABLE_READ";
+      txniso[
+        java.getStaticFieldValue(
+          "java.sql.Connection",
+          "TRANSACTION_SERIALIZABLE"
+        )
+      ] = "TRANSACTION_SERIALIZABLE";
 
       return txniso;
     })();
@@ -88,7 +110,7 @@ export class Connection {
   }
 
   async createStatement(...args: number[]): Promise<Statement> {
-    if (!args.every(arg => _.isNumber(arg))) {
+    if (!args.every((arg) => _.isNumber(arg))) {
       throw new Error("INVALID ARGUMENTS");
     }
 
@@ -108,4 +130,7 @@ export class Connection {
 
   async getAutoCommit(): Promise<boolean> {
     return new Promise<boolean>((resolve, reject) => {
-      this._conn.getAutoCommit((err: Error | null,
+      this._conn.getAutoCommit((err: Error | null) => {});
+    });
+  }
+}
