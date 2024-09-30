@@ -1,13 +1,21 @@
 /* jshint node: true */
 "use strict";
 
-import _ from 'lodash';
-import ResultSet from './resultset';
-import jinst from './jinst';
+import _ from "lodash";
+import ResultSet from "./resultset";
+import jinst from "./jinst";
 const java = jinst.getInstance();
 
 class Statement {
   private _s: any;
+
+  public static CLOSE_CURRENT_RESULT: any;
+  public static KEEP_CURRENT_RESULT: any;
+  public static CLOSE_ALL_RESULTS: any;
+  public static SUCCESS_NO_INFO: any;
+  public static EXECUTE_FAILED: any;
+  public static RETURN_GENERATED_KEYS: any;
+  public static NO_GENERATED_KEYS: any;
 
   constructor(s: any) {
     this._s = s;
@@ -57,7 +65,7 @@ class Statement {
     const args = Array.from(arguments);
 
     if (!(_.isString(args[0]) && _.isUndefined(args[1]))) {
-      throw new Error('INVALID ARGUMENTS');
+      throw new Error("INVALID ARGUMENTS");
     }
 
     return new Promise((resolve, reject) => {
@@ -74,8 +82,8 @@ class Statement {
   }
 
   async executeQuery(sql: string): Promise<ResultSet> {
-    if (typeof sql !== 'string') {
-      throw new Error('INVALID ARGUMENTS');
+    if (typeof sql !== "string") {
+      throw new Error("INVALID ARGUMENTS");
     }
 
     return new Promise((resolve, reject) => {
@@ -90,8 +98,8 @@ class Statement {
   }
 
   async execute(sql: string): Promise<any> {
-    if (typeof sql !== 'string') {
-      throw new Error('INVALID ARGUMENTS');
+    if (typeof sql !== "string") {
+      throw new Error("INVALID ARGUMENTS");
     }
 
     return new Promise((resolve, reject) => {
@@ -206,14 +214,35 @@ class Statement {
 }
 
 // Initialize constants like in the original code
-jinst.events.once('initialized', function onInitialized() {
-  Statement.CLOSE_CURRENT_RESULT = java.getStaticFieldValue('java.sql.Statement', 'CLOSE_CURRENT_RESULT');
-  Statement.KEEP_CURRENT_RESULT = java.getStaticFieldValue('java.sql.Statement', 'KEEP_CURRENT_RESULT');
-  Statement.CLOSE_ALL_RESULTS = java.getStaticFieldValue('java.sql.Statement', 'CLOSE_ALL_RESULTS');
-  Statement.SUCCESS_NO_INFO = java.getStaticFieldValue('java.sql.Statement', 'SUCCESS_NO_INFO');
-  Statement.EXECUTE_FAILED = java.getStaticFieldValue('java.sql.Statement', 'EXECUTE_FAILED');
-  Statement.RETURN_GENERATED_KEYS = java.getStaticFieldValue('java.sql.Statement', 'RETURN_GENERATED_KEYS');
-  Statement.NO_GENERATED_KEYS = java.getStaticFieldValue('java.sql.Statement', 'NO_GENERATED_KEYS');
+jinst.events.once("initialized", function onInitialized() {
+  Statement.CLOSE_CURRENT_RESULT = java.getStaticFieldValue(
+    "java.sql.Statement",
+    "CLOSE_CURRENT_RESULT"
+  );
+  Statement.KEEP_CURRENT_RESULT = java.getStaticFieldValue(
+    "java.sql.Statement",
+    "KEEP_CURRENT_RESULT"
+  );
+  Statement.CLOSE_ALL_RESULTS = java.getStaticFieldValue(
+    "java.sql.Statement",
+    "CLOSE_ALL_RESULTS"
+  );
+  Statement.SUCCESS_NO_INFO = java.getStaticFieldValue(
+    "java.sql.Statement",
+    "SUCCESS_NO_INFO"
+  );
+  Statement.EXECUTE_FAILED = java.getStaticFieldValue(
+    "java.sql.Statement",
+    "EXECUTE_FAILED"
+  );
+  Statement.RETURN_GENERATED_KEYS = java.getStaticFieldValue(
+    "java.sql.Statement",
+    "RETURN_GENERATED_KEYS"
+  );
+  Statement.NO_GENERATED_KEYS = java.getStaticFieldValue(
+    "java.sql.Statement",
+    "NO_GENERATED_KEYS"
+  );
 });
 
 export default Statement;

@@ -3,7 +3,8 @@ import java from 'java';
 import winston from 'winston';
 
 function isJvmCreated(): boolean {
-  return typeof java.onJvmCreated !== 'function';
+  // return typeof java.onJvmCreated !== 'function';
+  return typeof java.isJvmCreated !== 'function';
 }
 
 interface Jinst {

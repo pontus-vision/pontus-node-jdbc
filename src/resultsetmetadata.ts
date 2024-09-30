@@ -1,8 +1,5 @@
-/* jshint node: true */
-"use strict";
-
 class ResultSetMetaData {
-  private _rsmd: any;
+  public _rsmd: any;
 
   constructor(rsmd: any) {
     this._rsmd = rsmd;
@@ -10,22 +7,24 @@ class ResultSetMetaData {
 
   async getColumnCount(): Promise<number> {
     return new Promise((resolve, reject) => {
-      this._rsmd.getColumnCount((err: any, count: number) => {
+      this._rsmd.getColumnCount((err: Error | null, count: number) => {
         if (err) {
-          return reject(err);
+          reject(err);
+        } else {
+          resolve(count);
         }
-        resolve(count);
       });
     });
   }
 
   async getColumnName(column: number): Promise<string> {
     return new Promise((resolve, reject) => {
-      this._rsmd.getColumnName(column, (err: any, name: string) => {
+      this._rsmd.getColumnName(column, (err: Error | null, name: string) => {
         if (err) {
-          return reject(err);
+          reject(err);
+        } else {
+          resolve(name);
         }
-        resolve(name);
       });
     });
   }
