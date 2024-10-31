@@ -1,10 +1,10 @@
 /* jshint node: true */
 "use strict";
 
-import ResultSet from './resultset';
-import ResultSetMetaData from './resultsetmetadata';
-import Statement from './statement';
-import winston from 'winston';
+import ResultSet from './resultset.js';
+import ResultSetMetaData from './resultsetmetadata.js';
+import Statement from './statement.js';
+import console from 'console';
 
 class PreparedStatement extends Statement {
   private _ps: any;
@@ -36,7 +36,7 @@ class PreparedStatement extends Statement {
     return new Promise((resolve, reject) => {
       this._ps.execute((err: any, result: any) => {
         if (err) {
-          winston.error(err);
+          console.error(err);
           return reject(err);
         }
         resolve(result);
@@ -48,7 +48,7 @@ class PreparedStatement extends Statement {
     return new Promise((resolve, reject) => {
       this._ps.executeBatch((err: any, result: any) => {
         if (err) {
-          winston.error(err);
+          console.error(err);
           return reject(err);
         }
         resolve(result);
@@ -58,13 +58,7 @@ class PreparedStatement extends Statement {
 
   async executeQuery(): Promise<ResultSet> {
     return new Promise((resolve, reject) => {
-      this._ps.executeQuery((err: any, resultset: any) => {
-        if (err) {
-          winston.error(err);
-          return reject(err);
-        }
-        resolve(new ResultSet(resultset));
-      });
+      return resolve( new ResultSet(this._ps.executeQuerySync()));
     });
   }
 
@@ -72,7 +66,7 @@ class PreparedStatement extends Statement {
     return new Promise((resolve, reject) => {
       this._ps.executeUpdate((err: any, result: any) => {
         if (err) {
-          winston.error(err);
+          console.error(err);
           return reject(err);
         }
         resolve(result);

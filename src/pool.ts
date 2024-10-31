@@ -1,9 +1,9 @@
 import _ from "lodash";
 import { v4 as uuidv4 } from "uuid";
-import * as winston from "winston";
-import jinst from "./jinst";
-import dm from "./drivermanager";
-import Connection from "./connection";
+import * as console from "console";
+import jinst from "./jinst.js";
+import dm from "./drivermanager.js";
+import Connection from "./connection.js";
 
 
 interface KeepAliveConfig {
@@ -38,10 +38,10 @@ if (!jinst.isJvmCreated()) {
 
 const keepalive = (conn: any, query: string): void => {
   conn.createStatement((err: Error, statement: any) => {
-    if (err) return winston.error(err);
+    if (err) return console.error(err);
     statement.execute(query, (err: Error, result: any) => {
-      if (err) return winston.error(err);
-      winston.silly(`${new Date().toUTCString()} - Keep-Alive`);
+      if (err) return console.error(err);
+      console.debug(`${new Date().toUTCString()} - Keep-Alive`);
     });
   });
 };
@@ -209,12 +209,12 @@ class Pool {
       await this._addConnectionsOnInitialize();
       jinst.events.emit("initialized");
     } catch (err) {
-      winston.error(err);
+      console.error(err);
       throw err; // Rethrow the error for handling in the calling code
     }
   }
 
-  async reserve(): Promise<any> {
+  async reserve(): Promise<{[key: string]: any,conn: Connection}> {
     this._closeIdleConnections();
 
     let conn = null;
@@ -234,7 +234,7 @@ class Pool {
         );
         this._reserved.unshift(conn);
       } catch (err) {
-        winston.error(err);
+        console.error(err);
         conn = null;
         throw err;
       }

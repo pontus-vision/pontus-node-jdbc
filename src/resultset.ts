@@ -1,7 +1,6 @@
 import _ from 'lodash';
-import jinst from './jinst';
-import ResultSetMetaData from './resultsetmetadata';
-import winston from 'winston';
+import jinst from './jinst.js';
+import ResultSetMetaData from './resultsetmetadata.js';
 
 const java = jinst.getInstance();
 
@@ -59,6 +58,7 @@ class ResultSet {
       return typeNames;
     })();
   }
+
 
   async toObjArray(): Promise<any> {
     const result = await this.toObject();
@@ -148,6 +148,7 @@ class ResultSet {
           resolve(new ResultSetMetaData(rsmd));
         }
       });
+      // return resolve(new ResultSetMetaData(this._rs?.getMetaDataSync()))
     });
   }
 }

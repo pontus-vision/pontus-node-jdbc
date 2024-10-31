@@ -1,10 +1,10 @@
 import _ from "lodash";
-import jinst from "./jinst";
-import { CallableStatement } from "./callablestatement";
-import PreparedStatement from "./preparedstatement";
-import DatabaseMetaData from "./databasemetadata";
-import Statement from "./statement";
-import SQLWarning from "./sqlwarning";
+import jinst from "./jinst.js";
+import { CallableStatement } from "./callablestatement.js";
+import PreparedStatement from "./preparedstatement.js";
+import DatabaseMetaData from "./databasemetadata.js";
+import Statement from "./statement.js";
+import SQLWarning from "./sqlwarning.js";
 
 const java = jinst.getInstance();
 
@@ -60,11 +60,11 @@ type ConnectionType = {
   ) => void;
   prepareStatement: (
     sql: string,
-    arg1?: number | number[] | string[],
-    arg2?: number,
-    arg3?: number,
-    callback?: (err: Error | null, prepStmt: any) => void
+    arg1?: Record<string, any|any[]>
   ) => void;
+  prepareStatementSync: (
+    sql: string,
+  ) => PreparedStatement;
   releaseSavepoint: (
     savepoint: any,
     callback: (err: Error | null) => void
@@ -353,27 +353,93 @@ class Connection {
     });
   }
 
-  prepareStatement(
+
+
+  // prepareStatement (
+  //   sql: string,
+  //   arg1?: number | number[] | string[],
+  //   arg2?: number,
+  //   arg3?: number,
+  // ): Promise<any> {
+  //   return new Promise((resolve, reject) => {
+  //     // Check that `sql` is provided
+  //     if (!sql) {
+  //       return reject(new Error('INVALID ARGUMENTS'));
+  //     }
+  
+  //     // Validate additional arguments (arg1, arg2, arg3)
+  //     const validateArgs = (args: any[]): boolean => {
+  //       return args.every((arg, idx) => {
+  //         if (idx === 0 && Array.isArray(arg) && args.length === 1) {
+  //           return arg.every(item => typeof item === 'string' || typeof item === 'number');
+  //         }
+  //         return typeof arg === 'number';
+  //       });
+  //     };
+  
+  //     // Collect only defined arguments
+  //     const args = [sql, arg1, arg2, arg3].filter(arg => arg !== undefined) as [
+  //       string,
+  //       number | number[] | string[],
+  //       number?,
+  //       number?
+  //     ];
+  
+  //     if (!validateArgs(args.slice(1))) {
+  //       return reject(new Error('INVALID ARGUMENTS'));
+  //     }
+  
+  //     // Call `prepareStatement` with explicit arguments and a callback for handling the result
+  //     this._conn?.prepareStatement(
+  //       args[0],
+  //       args[1],
+  //       args[2],
+  //       args[3],
+  //       (err: Error | null, ps: any) => {
+  //         if (err) {
+  //           reject(err);
+  //         } else {
+  //           resolve(new PreparedStatement(ps));
+  //         }
+  //       }
+  //     );
+  //   });
+  // };
+
+  prepareStatement = (
     sql: string,
-    arg1?: number | number[] | string[],
-    arg2?: number,
-    arg3?: number
-  ): Promise<any> {
-    return new Promise((resolve, reject) => {
-      let args: [string, ...(number | number[] | string[])[]]; // Define args as a tuple type
+    arg1?: Record<string, any | any[]>  
 
-      // Always start with `sql` as the first argument
-      args = [sql];
+  ):Promise<PreparedStatement>=> {
 
-      // Conditionally add `arg1`, `arg2`, and `arg3` to the `args` array
-      if (arg1 !== undefined) args.push(arg1);
-      if (arg2 !== undefined) args.push(arg2);
-      if (arg3 !== undefined) args.push(arg3);
-
-      // Spread `args` into the `prepareStatement` call
-      this._conn?.prepareStatement(...args);
-    });
-  }
+    return new Promise((resolve, reject)=>{
+ 
+    // Check arg1, arg2, and arg3 for validity.  These arguments must
+    // be numbers if given, except for the special case when the first
+    // of these arguments is an array and no other arguments are given.
+    // In this special case, the array must be a string or number array.
+    //
+    // NOTE: _.tail returns all but the first argument, so we are only
+    // processing arg1, arg2, and arg3; and not sql (or callback, which
+    // was already removed from the args array).
+  
+    // if (invalidArgs) {
+    //   return reject(new Error(errMsg));
+    // }
+  
+    // Push a callback handler onto the arguments
+    // args.push(function (err, ps) {
+    //   if (err) {
+    //     return callback(err);
+    //   } else {
+    //     return callback(null, new PreparedStatement(ps));
+    //   }
+    // });
+  
+    // Forward modified arguments to _conn.prepareStatement
+    return resolve(new PreparedStatement(this._conn?.prepareStatementSync(sql)));
+    })
+  };
 
   releaseSavepoint(savepoint: any): Promise<void> {
     return new Promise((resolve, reject) => {
@@ -483,3 +549,7 @@ class Connection {
 }
 
 export default Connection;
+
+function allType(array: any[], type: string): boolean {
+  return array.every((el) => typeof el === type);
+}

@@ -2,8 +2,8 @@
 "use strict";
 
 import _ from "lodash";
-import ResultSet from "./resultset";
-import jinst from "./jinst";
+import ResultSet from "./resultset.js";
+import jinst from "./jinst.js";
 const java = jinst.getInstance();
 
 class Statement {
