@@ -11,7 +11,6 @@ const java = jinst.getInstance();
 if (!jinst.isJvmCreated()) {
   jinst.addOption("-Xrs");
 }
-
 type ConnectionType = {
   clearWarnings: (callback: (err: Error | null) => void) => void;
   close: (callback: (err: Error | null) => void) => void;
@@ -96,6 +95,43 @@ type ConnectionType = {
     callback: (err: Error | null) => void
   ) => void;
   setTypeMap: (map: any, callback: (err: Error | null) => void) => void;
+  getAutoCommitSync:() => boolean
+  getCatalogSync:() => Promise<string>
+  clearWarningsSync:() => Promise<void>
+  closeSync:() => Promise<void>
+  getClientInfoSync:(name: string) => string 
+  getHoldabilitySync(): number;
+  getMetaDataSync(): any;
+  getNetworkTimeoutSync(): number;
+  getSchemaSync(): string;
+  getTransactionIsolationSync(): string
+  getHoldabilitySync(): number;
+  getMetaDataSync(): any;
+  getNetworkTimeoutSync(): number;
+  getSchemaSync(): string;
+  getTransactionIsolationSync(): string;
+  getTypeMapSync(): any;
+  getWarningsSync(): any;
+  isClosedSync(): boolean;
+  isReadOnlySync(): boolean;
+  isValidSync(timeout: number): boolean;
+  prepareCallSync(
+    sql: string,
+    rstype: number,
+    rsconcurrency: number,
+    rsholdability: number
+  ): any;
+  releaseSavepointSync(savepoint: any): void;
+  rollbackSync(savepoint?: any): void;
+  setAutoCommitSync(autocommit: boolean): void;
+  setCatalogSync(catalog: string): void;
+  setClientInfoSync(props: any, name?: string, value?: string): void;
+  setHoldabilitySync(holdability: number): void;
+  setReadOnlySync(readonly: boolean): void;
+  setSavepointSync(name?: string): void;
+  setSchemaSync(schema: string): void;
+  setTransactionIsolationSync(txniso: number): void;
+  setTypeMapSync(map: any): void;
 };
 
 class Connection {
@@ -145,27 +181,13 @@ class Connection {
 
   clearWarnings(): Promise<void> {
     return new Promise((resolve, reject) => {
-      this._conn?.clearWarnings((err: Error | null) => {
-        if (err) reject(err);
-        else resolve();
-      });
+      resolve(this._conn?.clearWarningsSync())
     });
   }
 
   close(): Promise<void> {
     return new Promise((resolve, reject) => {
-      if (this._conn === null) {
-        resolve();
-        return;
-      }
-
-      this._conn.close((err: Error | null) => {
-        if (err) reject(err);
-        else {
-          this._conn = null;
-          resolve();
-        }
-      });
+      resolve(this._conn?.closeSync())
     });
   }
 
@@ -214,122 +236,80 @@ class Connection {
     return Promise.reject(new Error("NOT IMPLEMENTED"));
   }
 
-  getAutoCommit(): Promise<boolean> {
+  getAutoCommit(): Promise<boolean | undefined> {
     return new Promise((resolve, reject) => {
-      this._conn?.getAutoCommit((err: Error | null, result: boolean) => {
-        if (err) reject(err);
-        else resolve(result);
-      });
+      resolve(this._conn?.getAutoCommitSync());
     });
   }
 
   getCatalog(): Promise<string> {
     return new Promise((resolve, reject) => {
-      this._conn?.getCatalog((err: Error | null, catalog: string) => {
-        if (err) reject(err);
-        else resolve(catalog);
-      });
+      this._conn?.getCatalogSync();
     });
   }
 
-  getClientInfo(name: string): Promise<string> {
+  getClientInfo(name: string): Promise<string | undefined> {
     return new Promise((resolve, reject) => {
-      this._conn?.getClientInfo(name, (err: Error | null, result: string) => {
-        if (err) reject(err);
-        else resolve(result);
-      });
+      resolve(this._conn?.getClientInfoSync(name));
     });
   }
 
-  getHoldability(): Promise<number> {
+  getHoldability(): Promise<number | undefined> {
     return new Promise((resolve, reject) => {
-      this._conn?.getHoldability((err: Error | null, holdability: number) => {
-        if (err) reject(err);
-        else resolve(holdability);
-      });
+      resolve(this._conn?.getHoldabilitySync());
     });
   }
 
   getMetaData(): Promise<any> {
     return new Promise((resolve, reject) => {
-      this._conn?.getMetaData((err: Error | null, dbm: any) => {
-        if (err) reject(err);
-        else resolve(new DatabaseMetaData(dbm));
-      });
+      resolve(this._conn?.getMetaDataSync())
     });
   }
 
-  getNetworkTimeout(): Promise<number> {
+  getNetworkTimeout(): Promise<number | undefined> {
     return new Promise((resolve, reject) => {
-      this._conn?.getNetworkTimeout((err: Error | null, ms: number) => {
-        if (err) reject(err);
-        else resolve(ms);
-      });
+      resolve(this._conn?.getNetworkTimeoutSync())
     });
   }
 
-  getSchema(): Promise<string> {
+  getSchema(): Promise<string | undefined> {
     return new Promise((resolve, reject) => {
-      this._conn?.getSchema((err: Error | null, schema: string) => {
-        if (err) reject(err);
-        else resolve(schema);
-      });
+      resolve(this._conn?.getSchemaSync())
     });
   }
 
-  getTransactionIsolation(): Promise<string> {
+  getTransactionIsolation(): Promise<string | undefined> {
     return new Promise((resolve, reject) => {
-      this._conn?.getTransactionIsolation(
-        (err: Error | null, txniso: number) => {
-          if (err) reject(err);
-          else resolve(this._txniso[txniso]);
-        }
-      );
+      resolve(this._conn?.getTransactionIsolationSync())
     });
   }
 
   getTypeMap(): Promise<any> {
     return new Promise((resolve, reject) => {
-      this._conn?.getTypeMap((err: Error | null, map: any) => {
-        if (err) reject(err);
-        else resolve(map);
-      });
+      resolve(this._conn?.getTypeMapSync())
     });
   }
 
   getWarnings(): Promise<any> {
     return new Promise((resolve, reject) => {
-      this._conn?.getWarnings((err: Error | null, sqlwarning: any) => {
-        if (err) reject(err);
-        else resolve(sqlwarning);
-      });
+      resolve(this._conn?.getWarningsSync())
     });
   }
 
-  isClosed(): Promise<boolean> {
+  isClosed(): Promise<boolean | undefined> {
     return new Promise((resolve, reject) => {
-      this._conn?.isClosed((err: Error | null, closed: boolean) => {
-        if (err) reject(err);
-        else resolve(closed);
-      });
+      resolve(this._conn?.isClosedSync())
+    });
+  }
+  isReadOnly(): Promise<boolean | undefined > {
+    return new Promise((resolve, reject) => {
+      resolve(this._conn?.isReadOnlySync())
     });
   }
 
-  isReadOnly(): Promise<boolean> {
+  isValid(timeout: number): Promise<boolean | undefined> {
     return new Promise((resolve, reject) => {
-      this._conn?.isReadOnly((err: Error | null, readonly: boolean) => {
-        if (err) reject(err);
-        else resolve(readonly);
-      });
-    });
-  }
-
-  isValid(timeout: number): Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      this._conn?.isValid(timeout, (err: Error | null, valid: boolean) => {
-        if (err) reject(err);
-        else resolve(valid);
-      });
+      resolve(this._conn?.isValidSync(timeout))
     });
   }
 
@@ -340,16 +320,12 @@ class Connection {
     rsholdability: number
   ): Promise<any> {
     return new Promise((resolve, reject) => {
-      this._conn?.prepareCall(
+      resolve(this._conn?.prepareCallSync(
         sql,
         rstype,
         rsconcurrency,
         rsholdability,
-        (err: Error | null, callablestatement: any) => {
-          if (err) reject(err);
-          else resolve(new CallableStatement(callablestatement));
-        }
-      );
+      ))
     });
   }
 
@@ -441,109 +417,70 @@ class Connection {
     })
   };
 
-  releaseSavepoint(savepoint: any): Promise<void> {
+  releaseSavepoint(savepoint: any): Promise<void | undefined> {
     return new Promise((resolve, reject) => {
-      this._conn?.releaseSavepoint(savepoint, (err: Error | null) => {
-        if (err) reject(err);
-        else resolve();
-      });
+      resolve(this._conn?.releaseSavepointSync(savepoint));
     });
   }
 
   rollback(savepoint?: any): Promise<void> {
     return new Promise((resolve, reject) => {
-      if (savepoint) {
-        this._conn?.rollback(savepoint, (err: Error | null) => {
-          if (err) reject(err);
-          else resolve();
-        });
-      } else {
-        this._conn?.rollback(savepoint, (err: Error | null) => {
-          if (err) reject(err);
-          else resolve();
-        });
-      }
+        resolve(this._conn?.rollbackSync());
+      
     });
   }
 
-  setAutoCommit(autocommit: boolean): Promise<void> {
+  setAutoCommit(autocommit: boolean): Promise<void | undefined> {
     return new Promise((resolve, reject) => {
-      this._conn?.setAutoCommit(autocommit, (err: Error | null) => {
-        if (err) reject(err);
-        else resolve();
-      });
+      resolve(this._conn?.setAutoCommitSync(autocommit));
     });
   }
 
-  setCatalog(catalog: string): Promise<void> {
+  setCatalog(catalog: string): Promise<void | undefined> {
     return new Promise((resolve, reject) => {
-      this._conn?.setCatalog(catalog, (err: Error | null) => {
-        if (err) reject(err);
-        else resolve();
-      });
+      resolve(this._conn?.setCatalogSync(catalog));
     });
   }
 
-  setClientInfo(props: any, name?: string, value?: string): Promise<void> {
+  setClientInfo(props: any, name?: string, value?: string): Promise<void | undefined> {
     return new Promise((resolve, reject) => {
-      this._conn?.setClientInfo(props, name, value, (err: Error | null) => {
-        if (err) reject(err);
-        else resolve();
-      });
+      resolve(this._conn?.setClientInfoSync(props, name, value));
     });
   }
 
-  setHoldability(holdability: number): Promise<void> {
+  setHoldability(holdability: number): Promise<void | undefined> {
     return new Promise((resolve, reject) => {
-      this._conn?.setHoldability(holdability, (err: Error | null) => {
-        if (err) reject(err);
-        else resolve();
-      });
+      resolve(this._conn?.setHoldabilitySync(holdability));
     });
   }
 
-  setReadOnly(readonly: boolean): Promise<void> {
+  setReadOnly(readonly: boolean): Promise<void | undefined> {
     return new Promise((resolve, reject) => {
-      this._conn?.setReadOnly(readonly, (err: Error | null) => {
-        if (err) reject(err);
-        else resolve();
-      });
+      resolve(this._conn?.setReadOnlySync(readonly));
     });
   }
 
   setSavepoint(name?: string): Promise<void> {
     return new Promise((resolve, reject) => {
-      this._conn?.setSavepoint((err: Error | null) => {
-        if (err) reject(err);
-        else resolve();
-      }, name);
+      resolve(this._conn?.setSavepointSync());
     });
   }
   
   setSchema(schema: string): Promise<void> {
     return new Promise((resolve, reject) => {
-      this._conn?.setSchema(schema, (err: Error | null) => {
-        if (err) reject(err);
-        else resolve();
-      });
+      resolve(this._conn?.setSchemaSync(schema));
     });
   }
 
   setTransactionIsolation(txniso: number): Promise<void> {
     return new Promise((resolve, reject) => {
-      this._conn?.setTransactionIsolation(txniso, (err: Error | null) => {
-        if (err) reject(err);
-        else resolve();
-      });
+      resolve(this._conn?.setTransactionIsolationSync(txniso));
     });
   }
 
   setTypeMap(map: any): Promise<void> {
     return new Promise((resolve, reject) => {
-      this._conn?.setTypeMap(map, (err: Error | null) => {
-        if (err) reject(err);
-        else resolve();
-      });
+      resolve(this._conn?.setTypeMapSync(map));
     });
   }
 }
