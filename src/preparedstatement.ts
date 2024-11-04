@@ -4,7 +4,6 @@
 import ResultSet from './resultset.js';
 import ResultSetMetaData from './resultsetmetadata.js';
 import Statement from './statement.js';
-import console from 'console';
 
 class PreparedStatement extends Statement {
   private _ps: any;
@@ -58,19 +57,13 @@ class PreparedStatement extends Statement {
 
   async executeQuery(): Promise<ResultSet> {
     return new Promise((resolve, reject) => {
-      return resolve( new ResultSet(this._ps.executeQuerySync()));
+       resolve( new ResultSet(this._ps.executeQuerySync()));
     });
   }
 
   async executeUpdate(): Promise<any> {
     return new Promise((resolve, reject) => {
-      this._ps.executeUpdate((err: any, result: any) => {
-        if (err) {
-          console.error(err);
-          return reject(err);
-        }
-        resolve(result);
-      });
+     resolve(this._ps.executeUpdateSync())
     });
   }
 

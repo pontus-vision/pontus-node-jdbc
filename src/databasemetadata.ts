@@ -1,4 +1,3 @@
-import _ from "lodash";
 import ResultSet from "./resultset.js";
 import Connection from "./connection.js";
 import jinst from "./jinst.js";
@@ -59,26 +58,21 @@ class DatabaseMetaData implements IDatabaseMetaData {
     catalog: string | null = null,
     schemaPattern: string | null = null
   ): Promise<ResultSet> {
-    if (!_.isNull(catalog) && !_.isString(catalog)) {
+    if (catalog !== null && typeof catalog !== 'string') {
       throw new Error("INVALID_ARGUMENTS: catalog must be a string or null.");
     }
-    if (!_.isNull(schemaPattern) && !_.isString(schemaPattern)) {
+    if (schemaPattern !== null && typeof schemaPattern !== 'string') {
       throw new Error(
         "INVALID_ARGUMENTS: schemaPattern must be a string or null."
       );
     }
 
     return new Promise((resolve, reject) => {
-      this._dbm.getSchemas(
-        catalog,
-        schemaPattern,
-        (err: Error, result: any) => {
-          if (err) {
-            return reject(err);
-          }
-          resolve(new ResultSet(result));
-        }
-      );
+      try {
+        resolve(this._dbm.getSchemasSync(catalog, schemaPattern));
+      } catch (error) {
+        reject(reject)
+      }
     });
   }
 
@@ -88,25 +82,25 @@ class DatabaseMetaData implements IDatabaseMetaData {
     tableNamePattern: string | null = null,
     types: string[] | null = null
   ): Promise<ResultSet> {
-    if (!_.isNull(catalog) && !_.isString(catalog)) {
+    if (catalog !== null && typeof catalog !== 'string') {
       throw new Error("INVALID_ARGUMENTS: catalog must be a string or null.");
     }
-    if (!_.isNull(schemaPattern) && !_.isString(schemaPattern)) {
+    if (schemaPattern !== null && typeof schemaPattern !== 'string') {
       throw new Error(
         "INVALID_ARGUMENTS: schemaPattern must be a string or null."
       );
     }
-    if (!_.isNull(tableNamePattern) && !_.isString(tableNamePattern)) {
+    if (tableNamePattern !== null && typeof tableNamePattern !== 'string') {
       throw new Error(
         "INVALID_ARGUMENTS: tableNamePattern must be a string or null."
       );
     }
-    if (!_.isNull(types) && !_.isArray(types)) {
+    if (types !== null && !Array.isArray(types)) {
       throw new Error("INVALID_ARGUMENTS: types must be an array or null.");
     }
-    if (_.isArray(types)) {
+    if (Array.isArray(types)) {
       for (const type of types) {
-        if (!_.isString(type)) {
+        if (typeof type !== 'string') {
           throw new Error(
             "INVALID_ARGUMENTS: all elements in types array must be strings."
           );
@@ -115,125 +109,98 @@ class DatabaseMetaData implements IDatabaseMetaData {
     }
 
     return new Promise((resolve, reject) => {
-      this._dbm.getTables(
-        catalog,
-        schemaPattern,
-        tableNamePattern,
-        types,
-        (err: Error, result: any) => {
-          if (err) {
-            return reject(err);
-          }
-          resolve(new ResultSet(result));
-        }
-      );
+      try {  
+        resolve(this._dbm.getTablesSync(catalog, schemaPattern, tableNamePattern, types));
+      } catch (error) {
+        reject(error)
+      }
     });
   }
+
   async allProceduresAreCallable(): Promise<any> {
     return new Promise((resolve, reject) => {
-      this._dbm.allProceduresAreCallable((err: Error | null, result: any) => {
-        if (err) {
-          return reject(err);
-        }
-        return resolve(result);
-      });
+      try {
+        resolve(this._dbm.allProceduresAreCallableSync());
+      } catch (error) {
+        reject(error)
+      }
     });
   }
 
   async allTablesAreSelectable(): Promise<boolean> {
     return new Promise((resolve, reject) => {
-      this._dbm.allTablesAreSelectable((err: Error | null, result: boolean) => {
-        if (err) {
-          return reject(err);
-        }
-        return resolve(result);
-      });
+      try {
+        resolve(this._dbm.allTablesAreSelectableSync());
+      } catch (error) {
+        reject(error);
+      }
     });
   }
-
+  
   async autoCommitFailureClosesAllResultSets(): Promise<boolean> {
     return new Promise((resolve, reject) => {
-      this._dbm.autoCommitFailureClosesAllResultSets(
-        (err: Error | null, result: boolean) => {
-          if (err) {
-            return reject(err);
-          }
-          return resolve(result);
-        }
-      );
+      try {
+        resolve(this._dbm.autoCommitFailureClosesAllResultSetsSync());
+      } catch (error) {
+        reject(error);
+      }
     });
   }
-
+  
   async dataDefinitionCausesTransactionCommit(): Promise<boolean> {
     return new Promise((resolve, reject) => {
-      this._dbm.dataDefinitionCausesTransactionCommit(
-        (err: Error | null, result: boolean) => {
-          if (err) {
-            return reject(err);
-          }
-          return resolve(result);
-        }
-      );
+      try {
+        resolve(this._dbm.dataDefinitionCausesTransactionCommitSync());
+      } catch (error) {
+        reject(error);
+      }
     });
   }
-
+  
   async dataDefinitionIgnoredInTransactions(): Promise<boolean> {
     return new Promise((resolve, reject) => {
-      this._dbm.dataDefinitionIgnoredInTransactions(
-        (err: Error | null, result: boolean) => {
-          if (err) {
-            return reject(err);
-          }
-          return resolve(result);
-        }
-      );
+      try {
+        resolve(this._dbm.dataDefinitionIgnoredInTransactionsSync());
+      } catch (error) {
+        reject(error);
+      }
     });
   }
-
+  
   async deletesAreDetected(type: number): Promise<boolean> {
     return new Promise((resolve, reject) => {
       if (!Number.isInteger(type)) {
         return reject(new Error("INVALID ARGUMENTS"));
       }
-
-      this._dbm.deletesAreDetected(
-        type,
-        (err: Error | null, result: boolean) => {
-          if (err) {
-            return reject(err);
-          }
-          return resolve(result);
-        }
-      );
+      try {
+        resolve(this._dbm.deletesAreDetectedSync(type));
+      } catch (error) {
+        reject(error);
+      }
     });
   }
-
+  
   async doesMaxRowSizeIncludeBlobs(): Promise<boolean> {
     return new Promise((resolve, reject) => {
-      this._dbm.doesMaxRowSizeIncludeBlobs(
-        (err: Error | null, result: boolean) => {
-          if (err) {
-            return reject(err);
-          }
-          return resolve(result);
-        }
-      );
+      try {
+        resolve(this._dbm.doesMaxRowSizeIncludeBlobsSync());
+      } catch (error) {
+        reject(error);
+      }
     });
   }
+  
   // Promisified version of generatedKeyAlwaysReturned
   async generatedKeyAlwaysReturned(): Promise<boolean> {
     return new Promise((resolve, reject) => {
-      this._dbm.generatedKeyAlwaysReturned(
-        (err: Error | null, result: boolean) => {
-          if (err) {
-            return reject(err);
-          }
-          resolve(result);
-        }
-      );
+      try {
+        resolve(this._dbm.generatedKeyAlwaysReturnedSync());
+      } catch (error) {
+        reject(error);
+      }
     });
   }
-
+  
   // Promisified version of getAttributes
   async getAttributes(
     catalog: string | null | undefined,
@@ -243,37 +210,22 @@ class DatabaseMetaData implements IDatabaseMetaData {
   ): Promise<ResultSet> {
     return new Promise((resolve, reject) => {
       if (
-        (catalog === null ||
-          catalog === undefined ||
-          typeof catalog === "string") &&
-        (schemaPattern === null ||
-          schemaPattern === undefined ||
-          typeof schemaPattern === "string") &&
-        (typeNamePattern === null ||
-          typeNamePattern === undefined ||
-          typeof typeNamePattern === "string") &&
-        (attributeNamePattern === null ||
-          attributeNamePattern === undefined ||
-          typeof attributeNamePattern === "string")
+        (catalog === null || catalog === undefined || typeof catalog === "string") &&
+        (schemaPattern === null || schemaPattern === undefined || typeof schemaPattern === "string") &&
+        (typeNamePattern === null || typeNamePattern === undefined || typeof typeNamePattern === "string") &&
+        (attributeNamePattern === null || attributeNamePattern === undefined || typeof attributeNamePattern === "string")
       ) {
-        this._dbm.getAttributes(
-          catalog,
-          schemaPattern,
-          typeNamePattern,
-          attributeNamePattern,
-          (err: Error | null, result: any) => {
-            if (err) {
-              return reject(err);
-            }
-            resolve(new ResultSet(result));
-          }
-        );
+        try {
+          resolve(new ResultSet(this._dbm.getAttributesSync(catalog, schemaPattern, typeNamePattern, attributeNamePattern)));
+        } catch (error) {
+          reject(error);
+        }
       } else {
         reject(new Error("INVALID ARGUMENTS"));
       }
     });
   }
-
+  
   // Promisified version of getBestRowIdentifier
   async getBestRowIdentifier(
     catalog: string | null | undefined,
@@ -284,83 +236,67 @@ class DatabaseMetaData implements IDatabaseMetaData {
   ): Promise<ResultSet> {
     return new Promise((resolve, reject) => {
       if (
-        (catalog === null ||
-          catalog === undefined ||
-          typeof catalog === "string") &&
-        (schema === null ||
-          schema === undefined ||
-          typeof schema === "string") &&
+        (catalog === null || catalog === undefined || typeof catalog === "string") &&
+        (schema === null || schema === undefined || typeof schema === "string") &&
         typeof table === "string" &&
         Number.isInteger(scope) &&
         typeof nullable === "boolean"
       ) {
-        this._dbm.getBestRowIdentifier(
-          catalog,
-          schema,
-          table,
-          scope,
-          nullable,
-          (err: Error | null, result: any) => {
-            if (err) {
-              return reject(err);
-            }
-            resolve(new ResultSet(result));
-          }
-        );
+        try {
+          resolve(new ResultSet(this._dbm.getBestRowIdentifierSync(catalog, schema, table, scope, nullable)));
+        } catch (error) {
+          reject(error);
+        }
       } else {
         reject(new Error("INVALID ARGUMENTS"));
       }
     });
   }
-
+  
   // Promisified version of getCatalogs
   async getCatalogs(): Promise<ResultSet> {
     return new Promise((resolve, reject) => {
-      this._dbm.getCatalogs((err: Error | null, result: any) => {
-        if (err) {
-          return reject(err);
-        }
-        resolve(new ResultSet(result));
-      });
+      try {
+        resolve(new ResultSet(this._dbm.getCatalogsSync()));
+      } catch (error) {
+        reject(error);
+      }
     });
   }
-
+  
   // Promisified version of getCatalogSeparator
   async getCatalogSeparator(): Promise<string> {
     return new Promise((resolve, reject) => {
-      this._dbm.getCatalogSeparator((err: Error | null, result: string) => {
-        if (err) {
-          return reject(err);
-        }
-        resolve(result);
-      });
+      try {
+        resolve(this._dbm.getCatalogSeparatorSync());
+      } catch (error) {
+        reject(error);
+      }
     });
   }
-
+  
   // Promisified version of getCatalogTerm
   async getCatalogTerm(): Promise<string> {
     return new Promise((resolve, reject) => {
-      this._dbm.getCatalogTerm((err: Error | null, result: string) => {
-        if (err) {
-          return reject(err);
-        }
-        resolve(result);
-      });
+      try {
+        resolve(this._dbm.getCatalogTermSync());
+      } catch (error) {
+        reject(error);
+      }
     });
   }
-
+  
   // Promisified version of getClientInfoProperties
   async getClientInfoProperties(): Promise<ResultSet> {
     return new Promise((resolve, reject) => {
-      this._dbm.getClientInfoProperties((err: Error | null, result: any) => {
-        if (err) {
-          return reject(err);
-        }
-        resolve(new ResultSet(result));
-      });
+      try {
+        resolve(new ResultSet(this._dbm.getClientInfoPropertiesSync()));
+      } catch (error) {
+        reject(error);
+      }
     });
   }
-
+  
   // Promisified version of getColumnPrivileges
   async getColumnPrivileges(
     catalog: string | null | undefined,
@@ -370,35 +306,22 @@ class DatabaseMetaData implements IDatabaseMetaData {
   ): Promise<ResultSet> {
     return new Promise((resolve, reject) => {
       if (
-        (catalog === null ||
-          catalog === undefined ||
-          typeof catalog === "string") &&
-        (schema === null ||
-          schema === undefined ||
-          typeof schema === "string") &&
+        (catalog === null || catalog === undefined || typeof catalog === "string") &&
+        (schema === null || schema === undefined || typeof schema === "string") &&
         typeof table === "string" &&
-        (columnNamePattern === null ||
-          columnNamePattern === undefined ||
-          typeof columnNamePattern === "string")
+        (columnNamePattern === null || columnNamePattern === undefined || typeof columnNamePattern === "string")
       ) {
-        this._dbm.getColumnPrivileges(
-          catalog,
-          schema,
-          table,
-          columnNamePattern,
-          (err: Error | null, result: any) => {
-            if (err) {
-              return reject(err);
-            }
-            resolve(new ResultSet(result));
-          }
-        );
+        try {
+          resolve(new ResultSet(this._dbm.getColumnPrivilegesSync(catalog, schema, table, columnNamePattern)));
+        } catch (error) {
+          reject(error);
+        }
       } else {
         reject(new Error("INVALID ARGUMENTS"));
       }
     });
   }
-
+  
   // Promisified version of getColumns
   async getColumns(
     catalog: string | null | undefined,
@@ -408,49 +331,33 @@ class DatabaseMetaData implements IDatabaseMetaData {
   ): Promise<ResultSet> {
     return new Promise((resolve, reject) => {
       if (
-        (catalog === null ||
-          catalog === undefined ||
-          typeof catalog === "string") &&
-        (schemaPattern === null ||
-          schemaPattern === undefined ||
-          typeof schemaPattern === "string") &&
-        (tableNamePattern === null ||
-          tableNamePattern === undefined ||
-          typeof tableNamePattern === "string") &&
-        (columnNamePattern === null ||
-          columnNamePattern === undefined ||
-          typeof columnNamePattern === "string")
+        (catalog === null || catalog === undefined || typeof catalog === "string") &&
+        (schemaPattern === null || schemaPattern === undefined || typeof schemaPattern === "string") &&
+        (tableNamePattern === null || tableNamePattern === undefined || typeof tableNamePattern === "string") &&
+        (columnNamePattern === null || columnNamePattern === undefined || typeof columnNamePattern === "string")
       ) {
-        this._dbm.getColumns(
-          catalog,
-          schemaPattern,
-          tableNamePattern,
-          columnNamePattern,
-          (err: Error | null, result: any) => {
-            if (err) {
-              return reject(err);
-            }
-            resolve(new ResultSet(result));
-          }
-        );
+        try {
+          resolve(new ResultSet(this._dbm.getColumnsSync(catalog, schemaPattern, tableNamePattern, columnNamePattern)));
+        } catch (error) {
+          reject(error);
+        }
       } else {
         reject(new Error("INVALID ARGUMENTS"));
       }
     });
   }
-
+  
   // Promisified version of getConnection
   async getConnection(): Promise<Connection> {
     return new Promise((resolve, reject) => {
-      this._dbm.getConnection((err: Error | null, result: any) => {
-        if (err) {
-          return reject(err);
-        }
-        resolve(new Connection(result));
-      });
+      try {
+        resolve(new Connection(this._dbm.getConnectionSync()));
+      } catch (error) {
+        reject(error);
+      }
     });
   }
-
+  
   async getCrossReference(
     parentCatalog: string | null | undefined,
     parentSchema: string | null | undefined,
@@ -468,80 +375,66 @@ class DatabaseMetaData implements IDatabaseMetaData {
         (foreignSchema === null || typeof foreignSchema === "string") &&
         typeof foreignTable === "string"
       ) {
-        this._dbm.getCrossReference(
-          parentCatalog,
-          parentSchema,
-          parentTable,
-          foreignCatalog,
-          foreignSchema,
-          foreignTable,
-          (err: Error | null, result: any) => {
-            if (err) {
-              return reject(err);
-            }
-            resolve(new ResultSet(result));
-          }
-        );
+        try {
+          resolve(new ResultSet(this._dbm.getCrossReferenceSync(parentCatalog, parentSchema, parentTable, foreignCatalog, foreignSchema, foreignTable)));
+        } catch (error) {
+          reject(error);
+        }
       } else {
         reject(new Error("INVALID ARGUMENTS"));
       }
     });
   }
-
+  
   // Promisified version of getDatabaseMajorVersion
   async getDatabaseMajorVersion(): Promise<number> {
     return new Promise((resolve, reject) => {
-      this._dbm.getDatabaseMajorVersion((err: Error | null, result: number) => {
-        if (err) {
-          return reject(err);
-        }
-        resolve(result);
-      });
+      try {
+        resolve(this._dbm.getDatabaseMajorVersionSync());
+      } catch (error) {
+        reject(error);
+      }
     });
   }
-
+  
   // Promisified version of getDatabaseMinorVersion
   async getDatabaseMinorVersion(): Promise<number> {
     return new Promise((resolve, reject) => {
-      this._dbm.getDatabaseMinorVersion((err: Error | null, result: number) => {
-        if (err) {
-          return reject(err);
-        }
-        resolve(result);
-      });
+      try {
+        resolve(this._dbm.getDatabaseMinorVersionSync());
+      } catch (error) {
+        reject(error);
+      }
     });
   }
-
+  
   // Promisified version of getDatabaseProductName
   async getDatabaseProductName(): Promise<string> {
     return new Promise((resolve, reject) => {
-      this._dbm.getDatabaseProductName((err: Error | null, result: string) => {
-        if (err) {
-          return reject(err);
-        }
-        resolve(result);
-      });
+      try {
+        resolve(this._dbm.getDatabaseProductNameSync());
+      } catch (error) {
+        reject(error);
+      }
     });
   }
-
+  
   // Promisified version of getDatabaseProductVersion
   async getDatabaseProductVersion(): Promise<string> {
     return new Promise((resolve, reject) => {
-      this._dbm.getDatabaseProductVersion(
-        (err: Error | null, result: string) => {
-          if (err) {
-            return reject(err);
-          }
-          resolve(result);
-        }
-      );
+      try {
+        resolve(this._dbm.getDatabaseProductVersionSync());
+      } catch (error) {
+        reject(error);
+      }
     });
   }
+  
 
   // Promisified version of getDefaultTransactionIsolation
   async getDefaultTransactionIsolation(): Promise<number> {
     return new Promise((resolve, reject) => {
-      this._dbm.getDefaultTransactionIsolation(
+      this._dbm.getDefaultTransactionIsolationSync(
         (err: Error | null, result: number) => {
           if (err) {
             return reject(err);
@@ -555,7 +448,7 @@ class DatabaseMetaData implements IDatabaseMetaData {
   // Promisified version of getDriverMajorVersion
   async getDriverMajorVersion(): Promise<number> {
     return new Promise((resolve, reject) => {
-      this._dbm.getDriverMajorVersion((err: Error | null, result: number) => {
+      this._dbm.getDriverMajorVersionSync((err: Error | null, result: number) => {
         if (err) {
           return reject(err);
         }
@@ -567,7 +460,7 @@ class DatabaseMetaData implements IDatabaseMetaData {
   // Promisified version of getDriverMinorVersion
   async getDriverMinorVersion(): Promise<number> {
     return new Promise((resolve, reject) => {
-      this._dbm.getDriverMinorVersion((err: Error | null, result: number) => {
+      this._dbm.getDriverMinorVersionSync((err: Error | null, result: number) => {
         if (err) {
           return reject(err);
         }
@@ -579,7 +472,7 @@ class DatabaseMetaData implements IDatabaseMetaData {
   // Promisified version of getDriverName
   async getDriverName(): Promise<string> {
     return new Promise((resolve, reject) => {
-      this._dbm.getDriverName((err: Error | null, result: string) => {
+      this._dbm.getDriverNameSync((err: Error | null, result: string) => {
         if (err) {
           return reject(err);
         }
@@ -591,7 +484,7 @@ class DatabaseMetaData implements IDatabaseMetaData {
   // Promisified version of getDriverVersion
   async getDriverVersion(): Promise<string> {
     return new Promise((resolve, reject) => {
-      this._dbm.getDriverVersion((err: Error | null, result: string) => {
+      this._dbm.getDriverVersionSync((err: Error | null, result: string) => {
         if (err) {
           return reject(err);
         }
@@ -626,7 +519,7 @@ class DatabaseMetaData implements IDatabaseMetaData {
     }
 
     return new Promise((resolve, reject) => {
-      this._dbm.getExportedKeys(
+      this._dbm.getExportedKeysSync(
         catalog,
         schema,
         table,
@@ -648,7 +541,7 @@ class DatabaseMetaData implements IDatabaseMetaData {
    */
   async getExtraNameCharacters(): Promise<string> {
     return new Promise((resolve, reject) => {
-      this._dbm.getExtraNameCharacters((err: Error | null, result: string) => {
+      this._dbm.getExtraNameCharactersSync((err: Error | null, result: string) => {
         if (err) {
           return reject(err);
         }
@@ -692,7 +585,7 @@ class DatabaseMetaData implements IDatabaseMetaData {
     }
 
     return new Promise((resolve, reject) => {
-      this._dbm.getFunctionColumns(
+      this._dbm.getFunctionColumnsSync(
         catalog,
         schemaPattern,
         functionNamePattern,
@@ -737,7 +630,7 @@ class DatabaseMetaData implements IDatabaseMetaData {
     }
 
     return new Promise((resolve, reject) => {
-      this._dbm.getFunctions(
+      this._dbm.getFunctionsSync(
         catalog,
         schemaPattern,
         functionNamePattern,
@@ -758,7 +651,7 @@ class DatabaseMetaData implements IDatabaseMetaData {
    */
   async getIdentifierQuoteString(): Promise<string> {
     return new Promise((resolve, reject) => {
-      this._dbm.getIdentifierQuoteString(
+      this._dbm.getIdentifierQuoteStringSync(
         (err: Error | null, result: string) => {
           if (err) {
             return reject(err);
@@ -795,7 +688,7 @@ class DatabaseMetaData implements IDatabaseMetaData {
     }
 
     return new Promise((resolve, reject) => {
-      this._dbm.getImportedKeys(
+      this._dbm.getImportedKeysSync(
         catalog,
         schema,
         table,
@@ -840,7 +733,7 @@ class DatabaseMetaData implements IDatabaseMetaData {
     }
 
     return new Promise((resolve, reject) => {
-      this._dbm.getIndexInfo(
+      this._dbm.getIndexInfoSync(
         catalog,
         schema,
         table,
@@ -863,7 +756,7 @@ class DatabaseMetaData implements IDatabaseMetaData {
    */
   async getJDBCMajorVersion(): Promise<number> {
     return new Promise((resolve, reject) => {
-      this._dbm.getJDBCMajorVersion((err: Error | null, result: number) => {
+      this._dbm.getJDBCMajorVersionSync((err: Error | null, result: number) => {
         if (err) {
           return reject(err);
         }
@@ -879,7 +772,7 @@ class DatabaseMetaData implements IDatabaseMetaData {
    */
   async getJDBCMinorVersion(): Promise<number> {
     return new Promise((resolve, reject) => {
-      this._dbm.getJDBCMinorVersion((err: Error | null, result: number) => {
+      this._dbm.getJDBCMinorVersionSync((err: Error | null, result: number) => {
         if (err) {
           return reject(err);
         }
@@ -896,7 +789,7 @@ class DatabaseMetaData implements IDatabaseMetaData {
    */
   async getMaxBinaryLiteralLength(): Promise<number> {
     return new Promise((resolve, reject) => {
-      this._dbm.getMaxBinaryLiteralLength(
+      this._dbm.getMaxBinaryLiteralLengthSync(
         (err: Error | null, result: number) => {
           if (err) {
             return reject(err);
@@ -915,7 +808,7 @@ class DatabaseMetaData implements IDatabaseMetaData {
    */
   async getMaxCatalogNameLength(): Promise<number> {
     return new Promise((resolve, reject) => {
-      this._dbm.getMaxCatalogNameLength((err: Error | null, result: number) => {
+      this._dbm.getMaxCatalogNameLengthSync((err: Error | null, result: number) => {
         if (err) {
           return reject(err);
         }
@@ -932,7 +825,7 @@ class DatabaseMetaData implements IDatabaseMetaData {
    */
   async getMaxCharLiteralLength(): Promise<number> {
     return new Promise((resolve, reject) => {
-      this._dbm.getMaxCharLiteralLength((err: Error | null, result: number) => {
+      this._dbm.getMaxCharLiteralLengthSync((err: Error | null, result: number) => {
         if (err) {
           return reject(err);
         }
@@ -949,7 +842,7 @@ class DatabaseMetaData implements IDatabaseMetaData {
    */
   async getMaxColumnNameLength(): Promise<number> {
     return new Promise((resolve, reject) => {
-      this._dbm.getMaxColumnNameLength((err: Error | null, result: number) => {
+      this._dbm.getMaxColumnNameLengthSync((err: Error | null, result: number) => {
         if (err) {
           return reject(err);
         }
@@ -966,7 +859,7 @@ class DatabaseMetaData implements IDatabaseMetaData {
    */
   async getMaxColumnsInGroupBy(): Promise<number> {
     return new Promise((resolve, reject) => {
-      this._dbm.getMaxColumnsInGroupBy((err: Error | null, result: number) => {
+      this._dbm.getMaxColumnsInGroupBySync((err: Error | null, result: number) => {
         if (err) {
           return reject(err);
         }
@@ -982,7 +875,7 @@ class DatabaseMetaData implements IDatabaseMetaData {
    */
   async getMaxColumnsInIndex(): Promise<number> {
     return new Promise((resolve, reject) => {
-      this._dbm.getMaxColumnsInIndex((err: Error | null, result: number) => {
+      this._dbm.getMaxColumnsInIndexSync((err: Error | null, result: number) => {
         if (err) {
           return reject(err);
         }
@@ -999,7 +892,7 @@ class DatabaseMetaData implements IDatabaseMetaData {
    */
   async getMaxColumnsInOrderBy(): Promise<number> {
     return new Promise((resolve, reject) => {
-      this._dbm.getMaxColumnsInOrderBy((err: Error | null, result: number) => {
+      this._dbm.getMaxColumnsInOrderBySync((err: Error | null, result: number) => {
         if (err) {
           return reject(err);
         }
@@ -1016,7 +909,7 @@ class DatabaseMetaData implements IDatabaseMetaData {
    */
   async getMaxColumnsInSelect(): Promise<number> {
     return new Promise((resolve, reject) => {
-      this._dbm.getMaxColumnsInSelect((err: Error | null, result: number) => {
+      this._dbm.getMaxColumnsInSelectSync((err: Error | null, result: number) => {
         if (err) {
           return reject(err);
         }
@@ -1032,7 +925,7 @@ class DatabaseMetaData implements IDatabaseMetaData {
    */
   async getMaxColumnsInTable(): Promise<number> {
     return new Promise((resolve, reject) => {
-      this._dbm.getMaxColumnsInTable((err: Error | null, result: number) => {
+      this._dbm.getMaxColumnsInTableSync((err: Error | null, result: number) => {
         if (err) {
           return reject(err);
         }
@@ -1049,7 +942,7 @@ class DatabaseMetaData implements IDatabaseMetaData {
    */
   async getMaxConnections(): Promise<number> {
     return new Promise((resolve, reject) => {
-      this._dbm.getMaxConnections((err: Error | null, result: number) => {
+      this._dbm.getMaxConnectionsSync((err: Error | null, result: number) => {
         if (err) {
           return reject(err);
         }
@@ -1066,7 +959,7 @@ class DatabaseMetaData implements IDatabaseMetaData {
    */
   async getMaxCursorNameLength(): Promise<number> {
     return new Promise((resolve, reject) => {
-      this._dbm.getMaxCursorNameLength((err: Error | null, result: number) => {
+      this._dbm.getMaxCursorNameLengthSync((err: Error | null, result: number) => {
         if (err) {
           return reject(err);
         }
@@ -1083,7 +976,7 @@ class DatabaseMetaData implements IDatabaseMetaData {
    */
   async getMaxIndexLength(): Promise<number> {
     return new Promise((resolve, reject) => {
-      this._dbm.getMaxIndexLength((err: Error | null, result: number) => {
+      this._dbm.getMaxIndexLengthSync((err: Error | null, result: number) => {
         if (err) {
           return reject(err);
         }
@@ -1100,7 +993,7 @@ class DatabaseMetaData implements IDatabaseMetaData {
    */
   async getMaxProcedureNameLength(): Promise<number> {
     return new Promise((resolve, reject) => {
-      this._dbm.getMaxProcedureNameLength(
+      this._dbm.getMaxProcedureNameLengthSync(
         (err: Error | null, result: number) => {
           if (err) {
             return reject(err);
@@ -1118,7 +1011,7 @@ class DatabaseMetaData implements IDatabaseMetaData {
    */
   async getMaxRowSize(): Promise<number> {
     return new Promise((resolve, reject) => {
-      this._dbm.getMaxRowSize((err: Error | null, result: number) => {
+      this._dbm.getMaxRowSizeSync((err: Error | null, result: number) => {
         if (err) {
           return reject(err);
         }
@@ -1135,7 +1028,7 @@ class DatabaseMetaData implements IDatabaseMetaData {
    */
   async getMaxSchemaNameLength(): Promise<number> {
     return new Promise((resolve, reject) => {
-      this._dbm.getMaxSchemaNameLength((err: Error | null, result: number) => {
+      this._dbm.getMaxSchemaNameLengthSync((err: Error | null, result: number) => {
         if (err) {
           return reject(err);
         }
@@ -1152,7 +1045,7 @@ class DatabaseMetaData implements IDatabaseMetaData {
    */
   async getMaxStatementLength(): Promise<number> {
     return new Promise((resolve, reject) => {
-      this._dbm.getMaxStatementLength((err: Error | null, result: number) => {
+      this._dbm.getMaxStatementLengthSync((err: Error | null, result: number) => {
         if (err) {
           return reject(err);
         }
@@ -1183,7 +1076,7 @@ class DatabaseMetaData implements IDatabaseMetaData {
    */
   getMaxTableNameLength(): Promise<number> {
     return new Promise((resolve, reject) => {
-      this._dbm.getMaxTableNameLength((err: Error | null, result: number) => {
+      this._dbm.getMaxTableNameLengthSync((err: Error | null, result: number) => {
         if (err) {
           reject(err);
         } else {
@@ -1200,7 +1093,7 @@ class DatabaseMetaData implements IDatabaseMetaData {
    */
   getMaxTablesInSelect(): Promise<number> {
     return new Promise((resolve, reject) => {
-      this._dbm.getMaxTablesInSelect((err: Error | null, result: number) => {
+      this._dbm.getMaxTablesInSelectSync((err: Error | null, result: number) => {
         if (err) {
           reject(err);
         } else {
@@ -1217,7 +1110,7 @@ class DatabaseMetaData implements IDatabaseMetaData {
    */
   getMaxUserNameLength(): Promise<number> {
     return new Promise((resolve, reject) => {
-      this._dbm.getMaxUserNameLength((err: Error | null, result: number) => {
+      this._dbm.getMaxUserNameLengthSync((err: Error | null, result: number) => {
         if (err) {
           reject(err);
         } else {
@@ -1234,7 +1127,7 @@ class DatabaseMetaData implements IDatabaseMetaData {
    */
   getNumericFunctions(): Promise<string> {
     return new Promise((resolve, reject) => {
-      this._dbm.getNumericFunctions((err: Error | null, result: string) => {
+      this._dbm.getNumericFunctionsSync((err: Error | null, result: string) => {
         if (err) {
           reject(err);
         } else {
@@ -1272,7 +1165,7 @@ class DatabaseMetaData implements IDatabaseMetaData {
         return;
       }
 
-      this._dbm.getPrimaryKeys(
+      this._dbm.getPrimaryKeysSync(
         catalog,
         schema,
         table,
@@ -1322,7 +1215,7 @@ class DatabaseMetaData implements IDatabaseMetaData {
         return;
       }
 
-      this._dbm.getProcedureColumns(
+      this._dbm.getProcedureColumnsSync(
         catalog,
         schemaPattern,
         procedureNamePattern,
@@ -1368,7 +1261,7 @@ class DatabaseMetaData implements IDatabaseMetaData {
         return;
       }
 
-      this._dbm.getProcedures(
+      this._dbm.getProceduresSync(
         catalog,
         schemaPattern,
         procedureNamePattern,
@@ -1390,7 +1283,7 @@ class DatabaseMetaData implements IDatabaseMetaData {
    */
   getProcedureTerm(): Promise<string> {
     return new Promise((resolve, reject) => {
-      this._dbm.getProcedureTerm((err: Error, result: string) => {
+      this._dbm.getProcedureTermSync((err: Error, result: string) => {
         if (err) {
           reject(err);
         } else {
@@ -1435,7 +1328,7 @@ class DatabaseMetaData implements IDatabaseMetaData {
         return;
       }
 
-      this._dbm.getPseudoColumns(
+      this._dbm.getPseudoColumnsSync(
         catalog,
         schemaPattern,
         tableNamePattern,
@@ -1458,7 +1351,7 @@ class DatabaseMetaData implements IDatabaseMetaData {
    */
   getResultSetHoldability(): Promise<number> {
     return new Promise((resolve, reject) => {
-      this._dbm.getResultSetHoldability((err: Error, result: number) => {
+      this._dbm.getResultSetHoldabilitySync((err: Error, result: number) => {
         if (err) {
           reject(err);
         } else {
@@ -1475,7 +1368,7 @@ class DatabaseMetaData implements IDatabaseMetaData {
    */
   getRowIdLifetime(): Promise<RowIdLifetime> {
     return new Promise((resolve, reject) => {
-      this._dbm.getRowIdLifetime((err: Error, result: RowIdLifetime) => {
+      this._dbm.getRowIdLifetimeSync((err: Error, result: RowIdLifetime) => {
         if (err) {
           reject(err);
         } else {
@@ -1492,7 +1385,7 @@ class DatabaseMetaData implements IDatabaseMetaData {
    */
   getSchemaTerm(): Promise<string> {
     return new Promise((resolve, reject) => {
-      this._dbm.getSchemaTerm((err: Error, result: string) => {
+      this._dbm.getSchemaTermSync((err: Error, result: string) => {
         if (err) {
           reject(err);
         } else {
@@ -1509,7 +1402,7 @@ class DatabaseMetaData implements IDatabaseMetaData {
    */
   getSearchStringEscape(): Promise<string> {
     return new Promise((resolve, reject) => {
-      this._dbm.getSearchStringEscape((err: Error, result: string) => {
+      this._dbm.getSearchStringEscapeSync((err: Error, result: string) => {
         if (err) {
           reject(err);
         } else {
@@ -1526,7 +1419,7 @@ class DatabaseMetaData implements IDatabaseMetaData {
    */
   getSQLKeywords(): Promise<string> {
     return new Promise((resolve, reject) => {
-      this._dbm.getSQLKeywords((err: Error, result: string) => {
+      this._dbm.getSQLKeywordsSync((err: Error, result: string) => {
         if (err) {
           reject(err);
         } else {
@@ -1543,7 +1436,7 @@ class DatabaseMetaData implements IDatabaseMetaData {
    */
   getSQLStateType(): Promise<number> {
     return new Promise((resolve, reject) => {
-      this._dbm.getSQLStateType((err: Error, result: number) => {
+      this._dbm.getSQLStateTypeSync((err: Error, result: number) => {
         if (err) {
           reject(err);
         } else {
@@ -1560,7 +1453,7 @@ class DatabaseMetaData implements IDatabaseMetaData {
    */
   getStringFunctions(): Promise<string> {
     return new Promise((resolve, reject) => {
-      this._dbm.getStringFunctions((err: Error, result: string) => {
+      this._dbm.getStringFunctionsSync((err: Error, result: string) => {
         if (err) {
           reject(err);
         } else {
@@ -1600,7 +1493,7 @@ class DatabaseMetaData implements IDatabaseMetaData {
         return;
       }
 
-      this._dbm.getSuperTables(
+      this._dbm.getSuperTablesSync(
         catalog,
         schemaPattern,
         tableNamePattern,
@@ -1645,7 +1538,7 @@ class DatabaseMetaData implements IDatabaseMetaData {
         return;
       }
 
-      this._dbm.getSuperTypes(
+      this._dbm.getSuperTypesSync(
         catalog,
         schemaPattern,
         typeNamePattern,
@@ -1667,7 +1560,7 @@ class DatabaseMetaData implements IDatabaseMetaData {
    */
   getSystemFunctions(): Promise<string> {
     return new Promise((resolve, reject) => {
-      this._dbm.getSystemFunctions((err: Error | null, result: string) => {
+      this._dbm.getSystemFunctionsSync((err: Error | null, result: string) => {
         if (err) {
           reject(err);
         } else {
@@ -1676,782 +1569,665 @@ class DatabaseMetaData implements IDatabaseMetaData {
       });
     });
   }
+/**
+ * Retrieves a description of the privileges defined for a table.
+ *
+ * @param catalog - A catalog name; must match the catalog name as it is stored in this database; "" retrieves those without a catalog; null means that the catalog name should not be used to narrow the search
+ * @param schemaPattern - A schema pattern; must match the schema name as it is stored in the database; "" retrieves those without a schema; null means that the schema name should not be used to narrow the search
+ * @param tableNamePattern - A table name pattern; must match the table name as it is stored in this database; "" retrieves those without a table; null means that the table name should not be used to narrow the search
+ * @returns A promise that resolves to a ResultSet describing the table privileges.
+ */
+async getTablePrivileges(
+  catalog: string | null,
+  schemaPattern: string | null,
+  tableNamePattern: string
+): Promise<ResultSet> {
+  const validParams =
+    (catalog === null ||
+      catalog === undefined ||
+      typeof catalog === "string") &&
+    (schemaPattern === null ||
+      schemaPattern === undefined ||
+      typeof schemaPattern === "string") &&
+    typeof tableNamePattern === "string";
 
-  /**
-   * Retrieves a description of the privileges defined for a table.
-   *
-   * @param catalog - A catalog name; must match the catalog name as it is stored in this database; "" retrieves those without a catalog; null means that the catalog name should not be used to narrow the search
-   * @param schemaPattern - A schema pattern; must match the schema name as it is stored in the database; "" retrieves those without a schema; null means that the schema name should not be used to narrow the search
-   * @param tableNamePattern - A table name pattern; must match the table name as it is stored in this database; "" retrieves those without a table; null means that the table name should not be used to narrow the search
-   * @returns A promise that resolves to a ResultSet describing the table privileges.
-   */
-  getTablePrivileges(
-    catalog: string | null,
-    schemaPattern: string | null,
-    tableNamePattern: string
-  ): Promise<ResultSet> {
-    return new Promise((resolve, reject) => {
-      const validParams =
-        (catalog === null ||
-          catalog === undefined ||
-          typeof catalog === "string") &&
-        (schemaPattern === null ||
-          schemaPattern === undefined ||
-          typeof schemaPattern === "string") &&
-        typeof tableNamePattern === "string";
-
-      if (!validParams) {
-        reject(new Error("INVALID ARGUMENTS"));
-        return;
-      }
-
-      this._dbm.getTablePrivileges(
-        catalog,
-        schemaPattern,
-        tableNamePattern,
-        (err: Error | null, result: any) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(new ResultSet(result));
-          }
-        }
-      );
-    });
+  if (!validParams) {
+    throw new Error("INVALID ARGUMENTS");
   }
 
-  /**
-   * Retrieves a description of the table types available in this database.
-   *
-   * @returns A promise that resolves to a ResultSet describing the table types.
-   */
-  getTableTypes(): Promise<ResultSet> {
-    return new Promise((resolve, reject) => {
-      this._dbm.getTableTypes((err: Error | null, result: any) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(new ResultSet(result));
-        }
-      });
-    });
+  try {
+    const result = await this._dbm.getTablePrivilegesSync(
+      catalog,
+      schemaPattern,
+      tableNamePattern
+    );
+    return new ResultSet(result);
+  } catch (error) {
+    throw error;
   }
+}
 
-  /**
-   * Retrieves a comma-separated list of time and date functions available in this database.
-   *
-   * @returns A promise that resolves to a comma-separated list of time and date functions.
-   */
-  getTimeDateFunctions(): Promise<string> {
-    return new Promise((resolve, reject) => {
-      this._dbm.getTimeDateFunctions((err: Error | null, result: string) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(result);
-        }
-      });
-    });
+/**
+ * Retrieves a description of the table types available in this database.
+ *
+ * @returns A promise that resolves to a ResultSet describing the table types.
+ */
+async getTableTypes(): Promise<ResultSet> {
+  try {
+    const result = await this._dbm.getTableTypesSync();
+    return new ResultSet(result);
+  } catch (error) {
+    throw error;
   }
+}
 
-  /**
-   * Retrieves type information for the database.
-   *
-   * @returns A promise that resolves to a ResultSet describing the type information.
-   */
-  getTypeInfo(): Promise<ResultSet> {
-    return new Promise((resolve, reject) => {
-      this._dbm.getTypeInfo((err: Error | null, result: any) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(new ResultSet(result));
-        }
-      });
-    });
+/**
+ * Retrieves a comma-separated list of time and date functions available in this database.
+ *
+ * @returns A promise that resolves to a comma-separated list of time and date functions.
+ */
+async getTimeDateFunctions(): Promise<string> {
+  try {
+    const result = await this._dbm.getTimeDateFunctionsSync();
+    return result;
+  } catch (error) {
+    throw error;
   }
+}
 
-  /**
-   * Retrieves a description of user-defined types (UDTs) in a schema.
-   *
-   * @param catalog - A catalog name; must match the catalog name as it is stored in this database; "" retrieves those without a catalog; null means that the catalog name should not be used to narrow the search
-   * @param schemaPattern - A schema pattern; must match the schema name as it is stored in the database; "" retrieves those without a schema; null means that the schema name should not be used to narrow the search
-   * @param typeNamePattern - A type name pattern; must match the type name as it is stored in the database; "" retrieves those without a type; null means that the type name should not be used to narrow the search
-   * @param types - An array of type codes; null retrieves all types
-   * @returns A promise that resolves to a ResultSet describing the UDTs.
-   */
-  getUDTs(
-    catalog: string | null,
-    schemaPattern: string | null,
-    typeNamePattern: string | null,
-    types: number[] | null
-  ): Promise<ResultSet> {
-    return new Promise((resolve, reject) => {
-      let validParams =
-        (catalog === null ||
-          catalog === undefined ||
-          typeof catalog === "string") &&
-        (schemaPattern === null ||
-          schemaPattern === undefined ||
-          typeof schemaPattern === "string") &&
-        (typeNamePattern === null ||
-          typeNamePattern === undefined ||
-          typeof typeNamePattern === "string") &&
-        (types === null || types === undefined || Array.isArray(types));
-
-      if (Array.isArray(types)) {
-        for (const type of types) {
-          if (!Number.isInteger(type)) {
-            validParams = false;
-            break;
-          }
-        }
-      }
-
-      if (!validParams) {
-        reject(new Error("INVALID ARGUMENTS"));
-        return;
-      }
-
-      this._dbm.getUDTs(
-        catalog,
-        schemaPattern,
-        typeNamePattern,
-        types,
-        (err: Error | null, result: any) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(new ResultSet(result));
-          }
-        }
-      );
-    });
+/**
+ * Retrieves type information for the database.
+ *
+ * @returns A promise that resolves to a ResultSet describing the type information.
+ */
+async getTypeInfo(): Promise<ResultSet> {
+  try {
+    const result = await this._dbm.getTypeInfoSync();
+    return new ResultSet(result);
+  } catch (error) {
+    throw error;
   }
+}
 
-  /**
-   * Retrieves the URL of the database.
-   *
-   * @returns A promise that resolves to the database URL.
-   */
-  getURL(): Promise<string> {
-    return new Promise((resolve, reject) => {
-      this._dbm.getURL((err: Error | null, result: string) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(result);
-        }
-      });
-    });
-  }
+/**
+ * Retrieves a description of user-defined types (UDTs) in a schema.
+ *
+ * @param catalog - A catalog name; must match the catalog name as it is stored in this database; "" retrieves those without a catalog; null means that the catalog name should not be used to narrow the search
+ * @param schemaPattern - A schema pattern; must match the schema name as it is stored in the database; "" retrieves those without a schema; null means that the schema name should not be used to narrow the search
+ * @param typeNamePattern - A type name pattern; must match the type name as it is stored in this database; "" retrieves those without a type; null means that the type name should not be used to narrow the search
+ * @param types - An array of type codes; null retrieves all types
+ * @returns A promise that resolves to a ResultSet describing the UDTs.
+ */
+async getUDTs(
+  catalog: string | null,
+  schemaPattern: string | null,
+  typeNamePattern: string | null,
+  types: number[] | null
+): Promise<ResultSet> {
+  const validParams =
+    (catalog === null ||
+      catalog === undefined ||
+      typeof catalog === "string") &&
+    (schemaPattern === null ||
+      schemaPattern === undefined ||
+      typeof schemaPattern === "string") &&
+    (typeNamePattern === null ||
+      typeNamePattern === undefined ||
+      typeof typeNamePattern === "string") &&
+    (types === null || types === undefined || Array.isArray(types));
 
-  /**
-   * Retrieves the username associated with the database connection.
-   *
-   * @returns A promise that resolves to the username.
-   */
-  getUserName(): Promise<string> {
-    return new Promise((resolve, reject) => {
-      this._dbm.getUserName((err: Error | null, result: string) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(result);
-        }
-      });
-    });
-  }
-
-  /**
-   * Retrieves version columns for a given table.
-   *
-   * @param catalog - A catalog name; must match the catalog name as it is stored in this database; "" retrieves those without a catalog; null means that the catalog name should not be used to narrow the search
-   * @param schema - A schema pattern; must match the schema name as it is stored in the database; "" retrieves those without a schema; null means that the schema name should not be used to narrow the search
-   * @param table - A table name; must match the table name as it is stored in this database
-   * @returns A promise that resolves to a ResultSet describing the version columns.
-   */
-  getVersionColumns(
-    catalog: string | null,
-    schema: string | null,
-    table: string
-  ): Promise<ResultSet> {
-    return new Promise((resolve, reject) => {
-      const validParams =
-        (catalog === null ||
-          catalog === undefined ||
-          typeof catalog === "string") &&
-        (schema === null ||
-          schema === undefined ||
-          typeof schema === "string") &&
-        typeof table === "string";
-
-      if (!validParams) {
-        reject(new Error("INVALID ARGUMENTS"));
-        return;
-      }
-
-      this._dbm.getVersionColumns(
-        catalog,
-        schema,
-        table,
-        (err: Error | null, result: any) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(new ResultSet(result));
-          }
-        }
-      );
-    });
-  }
-
-  /**
-   * Checks if the database detects inserts.
-   *
-   * @param type - The type of insert to check
-   * @returns A promise that resolves to a boolean indicating if inserts are detected.
-   */
-  insertsAreDetected(type: number): Promise<boolean> {
-    return new Promise((resolve, reject) => {
+  if (Array.isArray(types)) {
+    for (const type of types) {
       if (!Number.isInteger(type)) {
-        reject(new Error("INVALID ARGUMENTS"));
-        return;
+        throw new Error("INVALID ARGUMENTS");
       }
-
-      this._dbm.insertsAreDetected(
-        type,
-        (err: Error | null, result: boolean) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(result);
-          }
-        }
-      );
-    });
-  }
-
-  /**
-   * Checks if the catalog is at the start of the URL.
-   *
-   * @returns A promise that resolves to a boolean indicating if the catalog is at the start.
-   */
-  isCatalogAtStart(): Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      this._dbm.isCatalogAtStart((err: Error | null, result: boolean) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(result);
-        }
-      });
-    });
-  }
-
-  /**
-   * Checks if the database is read-only.
-   *
-   * @returns A promise that resolves to a boolean indicating if the database is read-only.
-   */
-  isReadOnly(): Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      this._dbm.isReadOnly((err: Error | null, result: boolean) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(result);
-        }
-      });
-    });
-  }
-
-  /**
-   * Checks if locators are updated when the database copy is updated.
-   *
-   * @returns A promise that resolves to a boolean indicating if locators are updated.
-   */
-  locatorsUpdateCopy(): Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      this._dbm.locatorsUpdateCopy((err: Error | null, result: boolean) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(result);
-        }
-      });
-    });
-  }
-
-  /**
-   * Checks if adding a NULL to a non-NULL value results in NULL.
-   *
-   * @returns A promise that resolves to a boolean indicating if NULL plus non-NULL is NULL.
-   */
-  nullPlusNonNullIsNull(): Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      this._dbm.nullPlusNonNullIsNull((err: Error | null, result: boolean) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(result);
-        }
-      });
-    });
-  }
-
-  /**
-   * Checks if NULLs are sorted at the end.
-   *
-   * @returns A promise that resolves to a boolean indicating if NULLs are sorted at the end.
-   */
-  nullsAreSortedAtEnd(): Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      this._dbm.nullsAreSortedAtEnd((err: Error | null, result: boolean) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(result);
-        }
-      });
-    });
-  }
-
-  /**
-   * Checks if NULLs are sorted at the start.
-   *
-   * @returns A promise that resolves to a boolean indicating if NULLs are sorted at the start.
-   */
-  nullsAreSortedAtStart(): Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      this._dbm.nullsAreSortedAtStart((err: Error | null, result: boolean) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(result);
-        }
-      });
-    });
-  }
-
-  /**
-   * Checks if NULLs are sorted high.
-   *
-   * @returns A promise that resolves to a boolean indicating if NULLs are sorted high.
-   */
-  nullsAreSortedHigh(): Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      this._dbm.nullsAreSortedHigh((err: Error | null, result: boolean) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(result);
-        }
-      });
-    });
-  }
-
-  /**
-   * Checks if NULLs are sorted low.
-   *
-   * @returns A promise that resolves to a boolean indicating if NULLs are sorted low.
-   */
-  nullsAreSortedLow(): Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      this._dbm.nullsAreSortedLow((err: Error | null, result: boolean) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(result);
-        }
-      });
-    });
-  }
-
-  /**
-   * Checks if other deletes are visible for a specific type.
-   *
-   * @param type - The type of visibility to check.
-   * @returns A promise that resolves to a boolean indicating if other deletes are visible.
-   */
-  othersDeletesAreVisible(type: number): Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      if (!Number.isInteger(type)) {
-        reject(new Error("INVALID ARGUMENTS"));
-        return;
-      }
-
-      this._dbm.othersDeletesAreVisible(
-        type,
-        (err: Error | null, result: boolean) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(result);
-          }
-        }
-      );
-    });
-  }
-
-  /**
-   * Checks if other inserts are visible for a specific type.
-   *
-   * @param type - The type of visibility to check.
-   * @returns A promise that resolves to a boolean indicating if other inserts are visible.
-   */
-  othersInsertsAreVisible(type: number): Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      if (!Number.isInteger(type)) {
-        reject(new Error("INVALID ARGUMENTS"));
-        return;
-      }
-
-      this._dbm.othersInsertsAreVisible(
-        type,
-        (err: Error | null, result: boolean) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(result);
-          }
-        }
-      );
-    });
-  }
-
-  /**
-   * Checks if other updates are visible for a specific type.
-   *
-   * @param type - The type of visibility to check.
-   * @returns A promise that resolves to a boolean indicating if other updates are visible.
-   */
-  othersUpdatesAreVisible(type: number): Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      if (!Number.isInteger(type)) {
-        reject(new Error("INVALID ARGUMENTS"));
-        return;
-      }
-
-      this._dbm.othersUpdatesAreVisible(
-        type,
-        (err: Error | null, result: boolean) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(result);
-          }
-        }
-      );
-    });
-  }
-
-  ownDeletesAreVisible(type: number): Promise<boolean> {
-    if (!_.isInteger(type)) {
-      throw new Error("INVALID ARGUMENTS");
     }
-    return new Promise<boolean>((resolve, reject) => {
-      this._dbm.ownDeletesAreVisible(
-        type,
-        (err: Error | null, result: boolean) => {
-          if (err) {
-            return reject(err);
-          }
-          resolve(result);
-        }
-      );
-    });
   }
+
+  if (!validParams) {
+    throw new Error("INVALID ARGUMENTS");
+  }
+
+  try {
+    const result = await this._dbm.getUDTsSync(
+      catalog,
+      schemaPattern,
+      typeNamePattern,
+      types
+    );
+    return new ResultSet(result);
+  } catch (error) {
+    throw error;
+  }
+}
+
+/**
+ * Retrieves the URL of the database.
+ *
+ * @returns A promise that resolves to the database URL.
+ */
+async getURL(): Promise<string> {
+  try {
+    const result = await this._dbm.getURLSync();
+    return result;
+  } catch (error) {
+    throw error;
+  }
+}
+
+/**
+ * Retrieves the username associated with the database connection.
+ *
+ * @returns A promise that resolves to the username.
+ */
+getUserName(): Promise<string> {
+  return new Promise((resolve, reject) => {
+    try {
+      const result = this._dbm.getUserNameSync();
+      resolve(result);
+    } catch (err) {
+      reject(err);
+    }
+  });
+}
+
+/**
+ * Retrieves version columns for a given table.
+ *
+ * @param catalog - A catalog name; must match the catalog name as it is stored in this database; "" retrieves those without a catalog; null means that the catalog name should not be used to narrow the search
+ * @param schema - A schema pattern; must match the schema name as it is stored in the database; "" retrieves those without a schema; null means that the schema name should not be used to narrow the search
+ * @param table - A table name; must match the table name as it is stored in this database
+ * @returns A promise that resolves to a ResultSet describing the version columns.
+ */
+getVersionColumns(
+  catalog: string | null,
+  schema: string | null,
+  table: string
+): Promise<ResultSet> {
+  return new Promise((resolve, reject) => {
+    const validParams =
+      (catalog === null ||
+        catalog === undefined ||
+        typeof catalog === "string") &&
+      (schema === null ||
+        schema === undefined ||
+        typeof schema === "string") &&
+      typeof table === "string";
+
+    if (!validParams) {
+      reject(new Error("INVALID ARGUMENTS"));
+      return;
+    }
+
+    try {
+      const result = this._dbm.getVersionColumnsSync(catalog, schema, table);
+      resolve(new ResultSet(result));
+    } catch (err) {
+      reject(err);
+    }
+  });
+}
+
+/**
+ * Checks if the database detects inserts.
+ *
+ * @param type - The type of insert to check
+ * @returns A promise that resolves to a boolean indicating if inserts are detected.
+ */
+insertsAreDetected(type: number): Promise<boolean> {
+  return new Promise((resolve, reject) => {
+    if (!Number.isInteger(type)) {
+      reject(new Error("INVALID ARGUMENTS"));
+      return;
+    }
+
+    try {
+      const result = this._dbm.insertsAreDetectedSync(type);
+      resolve(result);
+    } catch (err) {
+      reject(err);
+    }
+  });
+}
+
+/**
+ * Checks if the catalog is at the start of the URL.
+ *
+ * @returns A promise that resolves to a boolean indicating if the catalog is at the start.
+ */
+isCatalogAtStart(): Promise<boolean> {
+  return new Promise((resolve, reject) => {
+    try {
+      const result = this._dbm.isCatalogAtStartSync();
+      resolve(result);
+    } catch (err) {
+      reject(err);
+    }
+  });
+}
+
+/**
+ * Checks if the database is read-only.
+ *
+ * @returns A promise that resolves to a boolean indicating if the database is read-only.
+ */
+isReadOnly(): Promise<boolean> {
+  return new Promise((resolve, reject) => {
+    try {
+      const result = this._dbm.isReadOnlySync();
+      resolve(result);
+    } catch (err) {
+      reject(err);
+    }
+  });
+}
+
+/**
+ * Checks if locators are updated when the database copy is updated.
+ *
+ * @returns A promise that resolves to a boolean indicating if locators are updated.
+ */
+locatorsUpdateCopy(): Promise<boolean> {
+  return new Promise((resolve, reject) => {
+    try {
+      const result = this._dbm.locatorsUpdateCopySync();
+      resolve(result);
+    } catch (err) {
+      reject(err);
+    }
+  });
+}
+
+/**
+ * Checks if adding a NULL to a non-NULL value results in NULL.
+ *
+ * @returns A promise that resolves to a boolean indicating if NULL plus non-NULL is NULL.
+ */
+nullPlusNonNullIsNull(): Promise<boolean> {
+  return new Promise((resolve, reject) => {
+    try {
+      const result = this._dbm.nullPlusNonNullIsNullSync();
+      resolve(result);
+    } catch (err) {
+      reject(err);
+    }
+  });
+}
+
+/**
+ * Checks if NULLs are sorted at the end.
+ *
+ * @returns A promise that resolves to a boolean indicating if NULLs are sorted at the end.
+ */
+nullsAreSortedAtEnd(): Promise<boolean> {
+  return new Promise((resolve, reject) => {
+    try {
+      const result = this._dbm.nullsAreSortedAtEndSync();
+      resolve(result);
+    } catch (err) {
+      reject(err);
+    }
+  });
+}
+
+/**
+ * Checks if NULLs are sorted at the start.
+ *
+ * @returns A promise that resolves to a boolean indicating if NULLs are sorted at the start.
+ */
+nullsAreSortedAtStart(): Promise<boolean> {
+  return new Promise((resolve, reject) => {
+    try {
+      const result = this._dbm.nullsAreSortedAtStartSync();
+      resolve(result);
+    } catch (err) {
+      reject(err);
+    }
+  });
+}
+
+/**
+ * Checks if NULLs are sorted high.
+ *
+ * @returns A promise that resolves to a boolean indicating if NULLs are sorted high.
+ */
+nullsAreSortedHigh(): Promise<boolean> {
+  return new Promise((resolve, reject) => {
+    try {
+      const result = this._dbm.nullsAreSortedHighSync();
+      resolve(result);
+    } catch (err) {
+      reject(err);
+    }
+  });
+}
+
+/**
+ * Checks if NULLs are sorted low.
+ *
+ * @returns A promise that resolves to a boolean indicating if NULLs are sorted low.
+ */
+nullsAreSortedLow(): Promise<boolean> {
+  return new Promise((resolve, reject) => {
+    try {
+      const result = this._dbm.nullsAreSortedLowSync();
+      resolve(result);
+    } catch (err) {
+      reject(err);
+    }
+  });
+}
+
+/**
+ * Checks if other deletes are visible for a specific type.
+ *
+ * @param type - The type of visibility to check.
+ * @returns A promise that resolves to a boolean indicating if other deletes are visible.
+ */
+othersDeletesAreVisible(type: number): Promise<boolean> {
+  return new Promise((resolve, reject) => {
+    if (!Number.isInteger(type)) {
+      reject(new Error("INVALID ARGUMENTS"));
+      return;
+    }
+
+    try {
+      const result = this._dbm.othersDeletesAreVisibleSync(type);
+      resolve(result);
+    } catch (err) {
+      reject(err);
+    }
+  });
+}
+
+/**
+ * Checks if other inserts are visible for a specific type.
+ *
+ * @param type - The type of visibility to check.
+ * @returns A promise that resolves to a boolean indicating if other inserts are visible.
+ */
+othersInsertsAreVisible(type: number): Promise<boolean> {
+  return new Promise((resolve, reject) => {
+    if (!Number.isInteger(type)) {
+      reject(new Error("INVALID ARGUMENTS"));
+      return;
+    }
+
+    try {
+      const result = this._dbm.othersInsertsAreVisibleSync(type);
+      resolve(result);
+    } catch (err) {
+      reject(err);
+    }
+  });
+}
+
+/**
+ * Checks if other updates are visible for a specific type.
+ *
+ * @param type - The type of visibility to check.
+ * @returns A promise that resolves to a boolean indicating if other updates are visible.
+ */
+othersUpdatesAreVisible(type: number): Promise<boolean> {
+  return new Promise((resolve, reject) => {
+    if (!Number.isInteger(type)) {
+      reject(new Error("INVALID ARGUMENTS"));
+      return;
+    }
+
+    try {
+      const result = this._dbm.othersUpdatesAreVisibleSync(type);
+      resolve(result);
+    } catch (err) {
+      reject(err);
+    }
+  });
+}
+
+/**
+ * Checks if own deletes are visible for a specific type.
+ *
+ * @param type - The type of visibility to check.
+ * @returns A promise that resolves to a boolean indicating if own deletes are visible.
+ */
+ownDeletesAreVisible(type: number): Promise<boolean> {
+  return new Promise((resolve, reject) => {
+    if (typeof type !== 'number') {
+      reject(new Error("INVALID ARGUMENTS"));
+      return;
+    }
+
+    try {
+      const result = this._dbm.ownDeletesAreVisibleSync(type);
+      resolve(result);
+    } catch (err) {
+      reject(err);
+    }
+  });
+}
+
 
   ownInsertsAreVisible(type: number): Promise<boolean> {
-    if (!_.isInteger(type)) {
-      throw new Error("INVALID ARGUMENTS");
+    if (typeof type !== 'number') {
+        throw new Error("INVALID ARGUMENTS");
     }
     return new Promise<boolean>((resolve, reject) => {
-      this._dbm.ownInsertsAreVisible(
-        type,
-        (err: Error | null, result: boolean) => {
-          if (err) {
-            return reject(err);
-          }
-          resolve(result);
+        try {
+            resolve(this._dbm.ownInsertsAreVisibleSync(type));
+        } catch (err) {
+            reject(err);
         }
-      );
     });
-  }
+}
 
-  ownUpdatesAreVisible(type: number): Promise<boolean> {
-    if (!_.isInteger(type)) {
-      throw new Error("INVALID ARGUMENTS");
+ownUpdatesAreVisible(type: number): Promise<boolean> {
+    if (typeof type !== 'number') {
+        throw new Error("INVALID ARGUMENTS");
     }
     return new Promise<boolean>((resolve, reject) => {
-      this._dbm.ownUpdatesAreVisible(
-        type,
-        (err: Error | null, result: boolean) => {
-          if (err) {
-            return reject(err);
-          }
-          resolve(result);
+        try {
+            resolve(this._dbm.ownUpdatesAreVisibleSync(type));
+        } catch (err) {
+            reject(err);
         }
-      );
     });
-  }
+}
 
-  storesLowerCaseIdentifiers(): Promise<boolean> {
+storesLowerCaseIdentifiers(): Promise<boolean> {
     return new Promise<boolean>((resolve, reject) => {
-      this._dbm.storesLowerCaseIdentifiers(
-        (err: Error | null, result: boolean) => {
-          if (err) {
-            return reject(err);
-          }
-          resolve(result);
+        try {
+            resolve(this._dbm.storesLowerCaseIdentifiersSync());
+        } catch (err) {
+            reject(err);
         }
-      );
     });
-  }
+}
 
-  storesLowerCaseQuotedIdentifiers(): Promise<boolean> {
+storesLowerCaseQuotedIdentifiers(): Promise<boolean> {
     return new Promise<boolean>((resolve, reject) => {
-      this._dbm.storesLowerCaseQuotedIdentifiers(
-        (err: Error | null, result: boolean) => {
-          if (err) {
-            return reject(err);
-          }
-          resolve(result);
+        try {
+            resolve(this._dbm.storesLowerCaseQuotedIdentifiersSync());
+        } catch (err) {
+            reject(err);
         }
-      );
     });
-  }
+}
 
-  storesMixedCaseIdentifiers(): Promise<boolean> {
+storesMixedCaseIdentifiers(): Promise<boolean> {
     return new Promise<boolean>((resolve, reject) => {
-      this._dbm.storesMixedCaseIdentifiers(
-        (err: Error | null, result: boolean) => {
-          if (err) {
-            return reject(err);
-          }
-          resolve(result);
+        try {
+            resolve(this._dbm.storesMixedCaseIdentifiersSync());
+        } catch (err) {
+            reject(err);
         }
-      );
     });
-  }
+}
 
-  storesMixedCaseQuotedIdentifiers(): Promise<boolean> {
+storesMixedCaseQuotedIdentifiers(): Promise<boolean> {
     return new Promise<boolean>((resolve, reject) => {
-      this._dbm.storesMixedCaseQuotedIdentifiers(
-        (err: Error | null, result: boolean) => {
-          if (err) {
-            return reject(err);
-          }
-          resolve(result);
+        try {
+            resolve(this._dbm.storesMixedCaseQuotedIdentifiersSync());
+        } catch (err) {
+            reject(err);
         }
-      );
     });
-  }
+}
 
-  storesUpperCaseIdentifiers(): Promise<boolean> {
+storesUpperCaseIdentifiers(): Promise<boolean> {
     return new Promise<boolean>((resolve, reject) => {
-      this._dbm.storesUpperCaseIdentifiers(
-        (err: Error | null, result: boolean) => {
-          if (err) {
-            return reject(err);
-          }
-          resolve(result);
+        try {
+            resolve(this._dbm.storesUpperCaseIdentifiersSync());
+        } catch (err) {
+            reject(err);
         }
-      );
     });
-  }
+}
 
-  storesUpperCaseQuotedIdentifiers(): Promise<boolean> {
+storesUpperCaseQuotedIdentifiers(): Promise<boolean> {
     return new Promise<boolean>((resolve, reject) => {
-      this._dbm.storesUpperCaseQuotedIdentifiers(
-        (err: Error | null, result: boolean) => {
-          if (err) {
-            return reject(err);
-          }
-          resolve(result);
+        try {
+            resolve(this._dbm.storesUpperCaseQuotedIdentifiersSync());
+        } catch (err) {
+            reject(err);
         }
-      );
     });
-  }
+}
 
-  supportsAlterTableWithAddColumn(): Promise<boolean> {
+supportsAlterTableWithAddColumn(): Promise<boolean> {
     return new Promise<boolean>((resolve, reject) => {
-      this._dbm.supportsAlterTableWithAddColumn(
-        (err: Error | null, result: boolean) => {
-          if (err) {
-            return reject(err);
-          }
-          resolve(result);
+        try {
+            resolve(this._dbm.supportsAlterTableWithAddColumnSync());
+        } catch (err) {
+            reject(err);
         }
-      );
     });
-  }
+}
 
-  supportsAlterTableWithDropColumn(): Promise<boolean> {
-    return new Promise<boolean>((resolve, reject) => {
-      this._dbm.supportsAlterTableWithDropColumn(
-        (err: Error | null, result: boolean) => {
-          if (err) {
-            return reject(err);
-          }
-          resolve(result);
-        }
-      );
-    });
-  }
 
-  supportsANSI92EntryLevelSQL(): Promise<boolean> {
-    return new Promise<boolean>((resolve, reject) => {
-      this._dbm.supportsANSI92EntryLevelSQL(
-        (err: Error | null, result: boolean) => {
-          if (err) {
-            return reject(err);
-          }
-          resolve(result);
-        }
-      );
-    });
-  }
+supportsAlterTableWithDropColumn(): Promise<boolean> {
+  return new Promise<boolean>((resolve, reject) => {
+      try {
+          resolve(this._dbm.supportsAlterTableWithDropColumnSync());
+      } catch (err) {
+          reject(err);
+      }
+  });
+}
 
-  supportsANSI92FullSQL(): Promise<boolean> {
-    return new Promise<boolean>((resolve, reject) => {
-      this._dbm.supportsANSI92FullSQL((err: Error | null, result: boolean) => {
-        if (err) {
-          return reject(err);
-        }
-        resolve(result);
-      });
-    });
-  }
+supportsANSI92EntryLevelSQL(): Promise<boolean> {
+  return new Promise<boolean>((resolve, reject) => {
+      try {
+          resolve(this._dbm.supportsANSI92EntryLevelSQLSync());
+      } catch (err) {
+          reject(err);
+      }
+  });
+}
 
-  supportsANSI92IntermediateSQL(): Promise<boolean> {
-    return new Promise<boolean>((resolve, reject) => {
-      this._dbm.supportsANSI92IntermediateSQL(
-        (err: Error | null, result: boolean) => {
-          if (err) {
-            return reject(err);
-          }
-          resolve(result);
-        }
-      );
-    });
-  }
+supportsANSI92FullSQL(): Promise<boolean> {
+  return new Promise<boolean>((resolve, reject) => {
+      try {
+          resolve(this._dbm.supportsANSI92FullSQLSync());
+      } catch (err) {
+          reject(err);
+      }
+  });
+}
 
-  supportsBatchUpdates(): Promise<boolean> {
-    return new Promise<boolean>((resolve, reject) => {
-      this._dbm.supportsBatchUpdates((err: Error | null, result: boolean) => {
-        if (err) {
-          return reject(err);
-        }
-        resolve(result);
-      });
-    });
-  }
+supportsANSI92IntermediateSQL(): Promise<boolean> {
+  return new Promise<boolean>((resolve, reject) => {
+      try {
+          resolve(this._dbm.supportsANSI92IntermediateSQLSync());
+      } catch (err) {
+          reject(err);
+      }
+  });
+}
 
-  supportsCatalogsInDataManipulation(): Promise<boolean> {
-    return new Promise<boolean>((resolve, reject) => {
-      this._dbm.supportsCatalogsInDataManipulation(
-        (err: Error | null, result: boolean) => {
-          if (err) {
-            return reject(err);
-          }
-          resolve(result);
-        }
-      );
-    });
-  }
+supportsBatchUpdates(): Promise<boolean> {
+  return new Promise<boolean>((resolve, reject) => {
+      try {
+          resolve(this._dbm.supportsBatchUpdatesSync());
+      } catch (err) {
+          reject(err);
+      }
+  });
+}
 
-  supportsCatalogsInIndexDefinitions(): Promise<boolean> {
-    return new Promise<boolean>((resolve, reject) => {
-      this._dbm.supportsCatalogsInIndexDefinitions(
-        (err: Error | null, result: boolean) => {
-          if (err) {
-            return reject(err);
-          }
-          resolve(result);
-        }
-      );
-    });
-  }
+supportsCatalogsInDataManipulation(): Promise<boolean> {
+  return new Promise<boolean>((resolve, reject) => {
+      try {
+          resolve(this._dbm.supportsCatalogsInDataManipulationSync());
+      } catch (err) {
+          reject(err);
+      }
+  });
+}
 
-  supportsCatalogsInPrivilegeDefinitions(): Promise<boolean> {
-    return new Promise<boolean>((resolve, reject) => {
-      this._dbm.supportsCatalogsInPrivilegeDefinitions(
-        (err: Error | null, result: boolean) => {
-          if (err) {
-            return reject(err);
-          }
-          resolve(result);
-        }
-      );
-    });
-  }
+supportsCatalogsInIndexDefinitions(): Promise<boolean> {
+  return new Promise<boolean>((resolve, reject) => {
+      try {
+          resolve(this._dbm.supportsCatalogsInIndexDefinitionsSync());
+      } catch (err) {
+          reject(err);
+      }
+  });
+}
 
-  supportsCatalogsInProcedureCalls(): Promise<boolean> {
-    return new Promise<boolean>((resolve, reject) => {
-      this._dbm.supportsCatalogsInProcedureCalls(
-        (err: Error | null, result: boolean) => {
-          if (err) {
-            return reject(err);
-          }
-          resolve(result);
-        }
-      );
-    });
-  }
+supportsCatalogsInPrivilegeDefinitions(): Promise<boolean> {
+  return new Promise<boolean>((resolve, reject) => {
+      try {
+          resolve(this._dbm.supportsCatalogsInPrivilegeDefinitionsSync());
+      } catch (err) {
+          reject(err);
+      }
+  });
+}
 
-  supportsCatalogsInTableDefinitions(): Promise<boolean> {
-    return new Promise<boolean>((resolve, reject) => {
-      this._dbm.supportsCatalogsInTableDefinitions(
-        (err: Error | null, result: boolean) => {
-          if (err) {
-            return reject(err);
-          }
-          resolve(result);
-        }
-      );
-    });
-  }
+supportsCatalogsInProcedureCalls(): Promise<boolean> {
+  return new Promise<boolean>((resolve, reject) => {
+      try {
+          resolve(this._dbm.supportsCatalogsInProcedureCallsSync());
+      } catch (err) {
+          reject(err);
+      }
+  });
+}
 
-  supportsColumnAliasing(): Promise<boolean> {
-    return new Promise<boolean>((resolve, reject) => {
-      this._dbm.supportsColumnAliasing((err: Error | null, result: boolean) => {
-        if (err) {
-          return reject(err);
-        }
-        resolve(result);
-      });
-    });
-  }
+supportsCatalogsInTableDefinitions(): Promise<boolean> {
+  return new Promise<boolean>((resolve, reject) => {
+      try {
+          resolve(this._dbm.supportsCatalogsInTableDefinitionsSync());
+      } catch (err) {
+          reject(err);
+      }
+  });
+}
+
+supportsColumnAliasing(): Promise<boolean> {
+  return new Promise<boolean>((resolve, reject) => {
+      try {
+          resolve(this._dbm.supportsColumnAliasingSync());
+      } catch (err) {
+          reject(err);
+      }
+  });
+}
+
 
   supportsConvert(fromType: number, toType: number): Promise<boolean> {
-    if (!_.isInteger(fromType) || !_.isInteger(toType)) {
+    if (typeof fromType !== 'number'  || typeof toType !== 'number') {
       throw new Error("INVALID ARGUMENTS");
     }
     return new Promise<boolean>((resolve, reject) => {
-      this._dbm.supportsConvert(
-        fromType,
-        toType,
-        (err: Error | null, result: boolean) => {
-          if (err) {
-            return reject(err);
-          }
-          resolve(result);
-        }
-      );
+      resolve(this._dbm.supportsConvertSync(fromType, toType));
     });
   }
 
   supportsCoreSQLGrammar(): Promise<boolean> {
     return new Promise<boolean>((resolve, reject) => {
-      this._dbm.supportsCoreSQLGrammar((err: Error | null, result: boolean) => {
-        if (err) {
-          return reject(err);
-        }
-        resolve(result);
-      });
-    });
+     resolve(this._dbm.supportsCoreSQLGrammarSync()) 
+    })
   }
 
   /**
@@ -2461,15 +2237,7 @@ class DatabaseMetaData implements IDatabaseMetaData {
    */
   supportsCorrelatedSubqueries(): Promise<boolean> {
     return new Promise((resolve, reject) => {
-      this._dbm.supportsCorrelatedSubqueries(
-        (err: Error | null, result: boolean) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(result);
-          }
-        }
-      );
+      resolve(this._dbm.supportsCorrelatedSubqueriesSync());
     });
   }
 
@@ -2480,15 +2248,7 @@ class DatabaseMetaData implements IDatabaseMetaData {
    */
   supportsDataDefinitionAndDataManipulationTransactions(): Promise<boolean> {
     return new Promise((resolve, reject) => {
-      this._dbm.supportsDataDefinitionAndDataManipulationTransactions(
-        (err: Error | null, result: boolean) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(result);
-          }
-        }
-      );
+      resolve(this._dbm.supportsDataDefinitionAndDataManipulationTransactionsSync());
     });
   }
 
@@ -2499,15 +2259,7 @@ class DatabaseMetaData implements IDatabaseMetaData {
    */
   supportsDataManipulationTransactionsOnly(): Promise<boolean> {
     return new Promise((resolve, reject) => {
-      this._dbm.supportsDataManipulationTransactionsOnly(
-        (err: Error | null, result: boolean) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(result);
-          }
-        }
-      );
+      resolve(this._dbm.supportsDataManipulationTransactionsOnlySync());
     });
   }
 
@@ -2518,15 +2270,7 @@ class DatabaseMetaData implements IDatabaseMetaData {
    */
   supportsDifferentTableCorrelationNames(): Promise<boolean> {
     return new Promise((resolve, reject) => {
-      this._dbm.supportsDifferentTableCorrelationNames(
-        (err: Error | null, result: boolean) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(result);
-          }
-        }
-      );
+      resolve(this._dbm.supportsDifferentTableCorrelationNamesSync());
     });
   }
 
@@ -2537,15 +2281,7 @@ class DatabaseMetaData implements IDatabaseMetaData {
    */
   supportsExpressionsInOrderBy(): Promise<boolean> {
     return new Promise((resolve, reject) => {
-      this._dbm.supportsExpressionsInOrderBy(
-        (err: Error | null, result: boolean) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(result);
-          }
-        }
-      );
+      resolve(this._dbm.supportsExpressionsInOrderBySync());
     });
   }
 
@@ -2556,15 +2292,7 @@ class DatabaseMetaData implements IDatabaseMetaData {
    */
   supportsExtendedSQLGrammar(): Promise<boolean> {
     return new Promise((resolve, reject) => {
-      this._dbm.supportsExtendedSQLGrammar(
-        (err: Error | null, result: boolean) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(result);
-          }
-        }
-      );
+      resolve(this._dbm.supportsExtendedSQLGrammarSync());
     });
   }
 
@@ -2575,13 +2303,7 @@ class DatabaseMetaData implements IDatabaseMetaData {
    */
   supportsFullOuterJoins(): Promise<boolean> {
     return new Promise((resolve, reject) => {
-      this._dbm.supportsFullOuterJoins((err: Error | null, result: boolean) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(result);
-        }
-      });
+      resolve(this._dbm.supportsFullOuterJoinsSync());
     });
   }
 
@@ -2592,15 +2314,7 @@ class DatabaseMetaData implements IDatabaseMetaData {
    */
   supportsGetGeneratedKeys(): Promise<boolean> {
     return new Promise((resolve, reject) => {
-      this._dbm.supportsGetGeneratedKeys(
-        (err: Error | null, result: boolean) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(result);
-          }
-        }
-      );
+      resolve(this._dbm.supportsGetGeneratedKeysSync());
     });
   }
 
@@ -2611,13 +2325,7 @@ class DatabaseMetaData implements IDatabaseMetaData {
    */
   supportsGroupBy(): Promise<boolean> {
     return new Promise((resolve, reject) => {
-      this._dbm.supportsGroupBy((err: Error | null, result: boolean) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(result);
-        }
-      });
+      resolve(this._dbm.supportsGroupBySync());
     });
   }
 
@@ -2628,15 +2336,7 @@ class DatabaseMetaData implements IDatabaseMetaData {
    */
   supportsGroupByBeyondSelect(): Promise<boolean> {
     return new Promise((resolve, reject) => {
-      this._dbm.supportsGroupByBeyondSelect(
-        (err: Error | null, result: boolean) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(result);
-          }
-        }
-      );
+      resolve(this._dbm.supportsGroupByBeyondSelectSync());
     });
   }
 
@@ -2647,15 +2347,7 @@ class DatabaseMetaData implements IDatabaseMetaData {
    */
   supportsGroupByUnrelated(): Promise<boolean> {
     return new Promise((resolve, reject) => {
-      this._dbm.supportsGroupByUnrelated(
-        (err: Error | null, result: boolean) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(result);
-          }
-        }
-      );
+      resolve(this._dbm.supportsGroupByUnrelatedSync());
     });
   }
 
@@ -2666,15 +2358,7 @@ class DatabaseMetaData implements IDatabaseMetaData {
    */
   supportsIntegrityEnhancementFacility(): Promise<boolean> {
     return new Promise((resolve, reject) => {
-      this._dbm.supportsIntegrityEnhancementFacility(
-        (err: Error | null, result: boolean) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(result);
-          }
-        }
-      );
+      resolve(this._dbm.supportsIntegrityEnhancementFacilitySync());
     });
   }
 
@@ -2685,15 +2369,7 @@ class DatabaseMetaData implements IDatabaseMetaData {
    */
   supportsLikeEscapeClause(): Promise<boolean> {
     return new Promise((resolve, reject) => {
-      this._dbm.supportsLikeEscapeClause(
-        (err: Error | null, result: boolean) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(result);
-          }
-        }
-      );
+      resolve(this._dbm.supportsLikeEscapeClauseSync());
     });
   }
 
@@ -2704,15 +2380,7 @@ class DatabaseMetaData implements IDatabaseMetaData {
    */
   supportsLimitedOuterJoins(): Promise<boolean> {
     return new Promise((resolve, reject) => {
-      this._dbm.supportsLimitedOuterJoins(
-        (err: Error | null, result: boolean) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(result);
-          }
-        }
-      );
+      resolve(this._dbm.supportsLimitedOuterJoinsSync());
     });
   }
 
@@ -2723,15 +2391,7 @@ class DatabaseMetaData implements IDatabaseMetaData {
    */
   supportsMinimumSQLGrammar(): Promise<boolean> {
     return new Promise((resolve, reject) => {
-      this._dbm.supportsMinimumSQLGrammar(
-        (err: Error | null, result: boolean) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(result);
-          }
-        }
-      );
+      resolve(this._dbm.supportsMinimumSQLGrammarSync());
     });
   }
 
@@ -2742,15 +2402,7 @@ class DatabaseMetaData implements IDatabaseMetaData {
    */
   supportsMixedCaseIdentifiers(): Promise<boolean> {
     return new Promise((resolve, reject) => {
-      this._dbm.supportsMixedCaseIdentifiers(
-        (err: Error | null, result: boolean) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(result);
-          }
-        }
-      );
+      resolve(this._dbm.supportsMixedCaseIdentifiersSync());
     });
   }
 
@@ -2761,15 +2413,7 @@ class DatabaseMetaData implements IDatabaseMetaData {
    */
   supportsMixedCaseQuotedIdentifiers(): Promise<boolean> {
     return new Promise((resolve, reject) => {
-      this._dbm.supportsMixedCaseQuotedIdentifiers(
-        (err: Error | null, result: boolean) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(result);
-          }
-        }
-      );
+      resolve(this._dbm.supportsMixedCaseQuotedIdentifiersSync());
     });
   }
 
@@ -2780,15 +2424,7 @@ class DatabaseMetaData implements IDatabaseMetaData {
    */
   supportsMultipleOpenResults(): Promise<boolean> {
     return new Promise((resolve, reject) => {
-      this._dbm.supportsMultipleOpenResults(
-        (err: Error | null, result: boolean) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(result);
-          }
-        }
-      );
+      resolve(this._dbm.supportsMultipleOpenResultsSync());
     });
   }
 
@@ -2799,15 +2435,7 @@ class DatabaseMetaData implements IDatabaseMetaData {
    */
   supportsMultipleResultSets(): Promise<boolean> {
     return new Promise((resolve, reject) => {
-      this._dbm.supportsMultipleResultSets(
-        (err: Error | null, result: boolean) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(result);
-          }
-        }
-      );
+      resolve(this._dbm.supportsMultipleResultSetsSync());
     });
   }
 
@@ -2818,15 +2446,7 @@ class DatabaseMetaData implements IDatabaseMetaData {
    */
   supportsMultipleTransactions(): Promise<boolean> {
     return new Promise((resolve, reject) => {
-      this._dbm.supportsMultipleTransactions(
-        (err: Error | null, result: boolean) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(result);
-          }
-        }
-      );
+      resolve(this._dbm.supportsMultipleTransactionsSync());
     });
   }
 
@@ -2837,15 +2457,7 @@ class DatabaseMetaData implements IDatabaseMetaData {
    */
   supportsNamedParameters(): Promise<boolean> {
     return new Promise((resolve, reject) => {
-      this._dbm.supportsNamedParameters(
-        (err: Error | null, result: boolean) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(result);
-          }
-        }
-      );
+      resolve(this._dbm.supportsNamedParametersSync());
     });
   }
 
@@ -2856,15 +2468,7 @@ class DatabaseMetaData implements IDatabaseMetaData {
    */
   supportsNonNullableColumns(): Promise<boolean> {
     return new Promise((resolve, reject) => {
-      this._dbm.supportsNonNullableColumns(
-        (err: Error | null, result: boolean) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(result);
-          }
-        }
-      );
+      resolve(this._dbm.supportsNonNullableColumnsSync());
     });
   }
 
@@ -2875,15 +2479,7 @@ class DatabaseMetaData implements IDatabaseMetaData {
    */
   supportsOpenCursorsAcrossCommit(): Promise<boolean> {
     return new Promise((resolve, reject) => {
-      this._dbm.supportsOpenCursorsAcrossCommit(
-        (err: Error | null, result: boolean) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(result);
-          }
-        }
-      );
+      resolve(this._dbm.supportsOpenCursorsAcrossCommitSync());
     });
   }
 
@@ -2893,75 +2489,44 @@ class DatabaseMetaData implements IDatabaseMetaData {
    * @returns A promise that resolves to a boolean indicating if open cursors across rollbacks are supported.
    */
   supportsOpenCursorsAcrossRollback(): Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      this._dbm.supportsOpenCursorsAcrossRollback(
-        (err: Error | null, result: boolean) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(result);
-          }
-        }
-      );
+    return new Promise((resolve) => {
+      resolve(this._dbm.supportsOpenCursorsAcrossRollbackSync());
     });
   }
-
+  
   /**
    * Checks if open statements across commits are supported.
    *
    * @returns A promise that resolves to a boolean indicating if open statements across commits are supported.
    */
   supportsOpenStatementsAcrossCommit(): Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      this._dbm.supportsOpenStatementsAcrossCommit(
-        (err: Error | null, result: boolean) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(result);
-          }
-        }
-      );
+    return new Promise((resolve) => {
+      resolve(this._dbm.supportsOpenStatementsAcrossCommitSync());
     });
   }
-
+  
   /**
    * Checks if open statements across rollbacks are supported.
    *
    * @returns A promise that resolves to a boolean indicating if open statements across rollbacks are supported.
    */
   supportsOpenStatementsAcrossRollback(): Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      this._dbm.supportsOpenStatementsAcrossRollback(
-        (err: Error | null, result: boolean) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(result);
-          }
-        }
-      );
+    return new Promise((resolve) => {
+      resolve(this._dbm.supportsOpenStatementsAcrossRollbackSync());
     });
   }
-
+  
   /**
    * Checks if ordering by unrelated columns is supported.
    *
    * @returns A promise that resolves to a boolean indicating if ordering by unrelated columns is supported.
    */
   supportsOrderByUnrelated(): Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      this._dbm.supportsOrderByUnrelated(
-        (err: Error | null, result: boolean) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(result);
-          }
-        }
-      );
+    return new Promise((resolve) => {
+      resolve(this._dbm.supportsOrderByUnrelatedSync());
     });
   }
+  
 
   /**
    * Checks if outer joins are supported.
@@ -2969,55 +2534,33 @@ class DatabaseMetaData implements IDatabaseMetaData {
    * @returns A promise that resolves to a boolean indicating if outer joins are supported.
    */
   supportsOuterJoins(): Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      this._dbm.supportsOuterJoins((err: Error | null, result: boolean) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(result);
-        }
-      });
+    return new Promise((resolve) => {
+      resolve(this._dbm.supportsOuterJoinsSync());
     });
   }
-
+  
   /**
    * Checks if positioned delete operations are supported.
    *
    * @returns A promise that resolves to a boolean indicating if positioned delete operations are supported.
    */
   supportsPositionedDelete(): Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      this._dbm.supportsPositionedDelete(
-        (err: Error | null, result: boolean) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(result);
-          }
-        }
-      );
+    return new Promise((resolve) => {
+      resolve(this._dbm.supportsPositionedDeleteSync());
     });
   }
-
+  
   /**
    * Checks if positioned update operations are supported.
    *
    * @returns A promise that resolves to a boolean indicating if positioned update operations are supported.
    */
   supportsPositionedUpdate(): Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      this._dbm.supportsPositionedUpdate(
-        (err: Error | null, result: boolean) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(result);
-          }
-        }
-      );
+    return new Promise((resolve) => {
+      resolve(this._dbm.supportsPositionedUpdateSync());
     });
   }
-
+  
   /**
    * Checks if the result set concurrency is supported.
    *
@@ -3025,29 +2568,16 @@ class DatabaseMetaData implements IDatabaseMetaData {
    * @param concurrency - The concurrency level.
    * @returns A promise that resolves to a boolean indicating if the result set concurrency is supported.
    */
-  supportsResultSetConcurrency(
-    type: number,
-    concurrency: number
-  ): Promise<boolean> {
+  supportsResultSetConcurrency(type: number, concurrency: number): Promise<boolean> {
     if (!Number.isInteger(type) || !Number.isInteger(concurrency)) {
       return Promise.reject(new Error("INVALID ARGUMENTS"));
     }
-
-    return new Promise((resolve, reject) => {
-      this._dbm.supportsResultSetConcurrency(
-        type,
-        concurrency,
-        (err: Error | null, result: boolean) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(result);
-          }
-        }
-      );
+  
+    return new Promise((resolve) => {
+      resolve(this._dbm.supportsResultSetConcurrencySync(type, concurrency));
     });
   }
-
+  
   /**
    * Checks if the result set holdability is supported.
    *
@@ -3058,21 +2588,12 @@ class DatabaseMetaData implements IDatabaseMetaData {
     if (!Number.isInteger(holdability)) {
       return Promise.reject(new Error("INVALID ARGUMENTS"));
     }
-
-    return new Promise((resolve, reject) => {
-      this._dbm.supportsResultSetHoldability(
-        holdability,
-        (err: Error | null, result: boolean) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(result);
-          }
-        }
-      );
+  
+    return new Promise((resolve) => {
+      resolve(this._dbm.supportsResultSetHoldabilitySync(holdability));
     });
   }
-
+  
   /**
    * Checks if the result set type is supported.
    *
@@ -3083,304 +2604,177 @@ class DatabaseMetaData implements IDatabaseMetaData {
     if (!Number.isInteger(type)) {
       return Promise.reject(new Error("INVALID ARGUMENTS"));
     }
-
-    return new Promise((resolve, reject) => {
-      this._dbm.supportsResultSetType(
-        type,
-        (err: Error | null, result: boolean) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(result);
-          }
-        }
-      );
+  
+    return new Promise((resolve) => {
+      resolve(this._dbm.supportsResultSetTypeSync(type));
     });
   }
-
+  
   /**
    * Checks if savepoints are supported.
    *
    * @returns A promise that resolves to a boolean indicating if savepoints are supported.
    */
   supportsSavepoints(): Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      this._dbm.supportsSavepoints((err: Error | null, result: boolean) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(result);
-        }
-      });
+    return new Promise((resolve) => {
+      resolve(this._dbm.supportsSavepointsSync());
     });
   }
-
+  
   /**
    * Checks if schemas in data manipulation are supported.
    *
    * @returns A promise that resolves to a boolean indicating if schemas in data manipulation are supported.
    */
   supportsSchemasInDataManipulation(): Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      this._dbm.supportsSchemasInDataManipulation(
-        (err: Error | null, result: boolean) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(result);
-          }
-        }
-      );
+    return new Promise((resolve) => {
+      resolve(this._dbm.supportsSchemasInDataManipulationSync());
     });
   }
-
+  
   /**
    * Checks if schemas in index definitions are supported.
    *
    * @returns A promise that resolves to a boolean indicating if schemas in index definitions are supported.
    */
   supportsSchemasInIndexDefinitions(): Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      this._dbm.supportsSchemasInIndexDefinitions(
-        (err: Error | null, result: boolean) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(result);
-          }
-        }
-      );
+    return new Promise((resolve) => {
+      resolve(this._dbm.supportsSchemasInIndexDefinitionsSync());
     });
   }
-
+  
   /**
    * Checks if schemas in privilege definitions are supported.
    *
    * @returns A promise that resolves to a boolean indicating if schemas in privilege definitions are supported.
    */
   supportsSchemasInPrivilegeDefinitions(): Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      this._dbm.supportsSchemasInPrivilegeDefinitions(
-        (err: Error | null, result: boolean) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(result);
-          }
-        }
-      );
+    return new Promise((resolve) => {
+      resolve(this._dbm.supportsSchemasInPrivilegeDefinitionsSync());
     });
   }
-
+  
   /**
    * Checks if schemas in procedure calls are supported.
    *
    * @returns A promise that resolves to a boolean indicating if schemas in procedure calls are supported.
    */
   supportsSchemasInProcedureCalls(): Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      this._dbm.supportsSchemasInProcedureCalls(
-        (err: Error | null, result: boolean) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(result);
-          }
-        }
-      );
+    return new Promise((resolve) => {
+      resolve(this._dbm.supportsSchemasInProcedureCallsSync());
     });
   }
-
+  
   /**
    * Checks if schemas in table definitions are supported.
    *
    * @returns A promise that resolves to a boolean indicating if schemas in table definitions are supported.
    */
   supportsSchemasInTableDefinitions(): Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      this._dbm.supportsSchemasInTableDefinitions(
-        (err: Error | null, result: boolean) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(result);
-          }
-        }
-      );
+    return new Promise((resolve) => {
+      resolve(this._dbm.supportsSchemasInTableDefinitionsSync());
     });
   }
-
+  
   /**
    * Checks if select for update is supported.
    *
    * @returns A promise that resolves to a boolean indicating if select for update is supported.
    */
   supportsSelectForUpdate(): Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      this._dbm.supportsSelectForUpdate(
-        (err: Error | null, result: boolean) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(result);
-          }
-        }
-      );
+    return new Promise((resolve) => {
+      resolve(this._dbm.supportsSelectForUpdateSync());
     });
   }
-
+  
   /**
    * Checks if statement pooling is supported.
    *
    * @returns A promise that resolves to a boolean indicating if statement pooling is supported.
    */
   supportsStatementPooling(): Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      this._dbm.supportsStatementPooling(
-        (err: Error | null, result: boolean) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(result);
-          }
-        }
-      );
+    return new Promise((resolve) => {
+      resolve(this._dbm.supportsStatementPoolingSync());
     });
   }
-
+  
   /**
    * Checks if stored functions using call syntax are supported.
    *
    * @returns A promise that resolves to a boolean indicating if stored functions using call syntax are supported.
    */
   supportsStoredFunctionsUsingCallSyntax(): Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      this._dbm.supportsStoredFunctionsUsingCallSyntax(
-        (err: Error | null, result: boolean) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(result);
-          }
-        }
-      );
+    return new Promise((resolve) => {
+      resolve(this._dbm.supportsStoredFunctionsUsingCallSyntaxSync());
     });
   }
-
+  
   /**
    * Checks if stored procedures are supported.
    *
    * @returns A promise that resolves to a boolean indicating if stored procedures are supported.
    */
   supportsStoredProcedures(): Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      this._dbm.supportsStoredProcedures(
-        (err: Error | null, result: boolean) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(result);
-          }
-        }
-      );
+    return new Promise((resolve) => {
+      resolve(this._dbm.supportsStoredProceduresSync());
     });
   }
-
+  
   /**
    * Checks if subqueries in comparisons are supported.
    *
    * @returns A promise that resolves to a boolean indicating if subqueries in comparisons are supported.
    */
   supportsSubqueriesInComparisons(): Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      this._dbm.supportsSubqueriesInComparisons(
-        (err: Error | null, result: boolean) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(result);
-          }
-        }
-      );
+    return new Promise((resolve) => {
+      resolve(this._dbm.supportsSubqueriesInComparisonsSync());
     });
   }
-
+  
   /**
    * Checks if subqueries in EXISTS clauses are supported.
    *
    * @returns A promise that resolves to a boolean indicating if subqueries in EXISTS clauses are supported.
    */
   supportsSubqueriesInExists(): Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      this._dbm.supportsSubqueriesInExists(
-        (err: Error | null, result: boolean) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(result);
-          }
-        }
-      );
+    return new Promise((resolve) => {
+      resolve(this._dbm.supportsSubqueriesInExistsSync());
     });
   }
-
+  
   /**
    * Checks if subqueries in IN clauses are supported.
    *
    * @returns A promise that resolves to a boolean indicating if subqueries in IN clauses are supported.
    */
   supportsSubqueriesInIns(): Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      this._dbm.supportsSubqueriesInIns(
-        (err: Error | null, result: boolean) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(result);
-          }
-        }
-      );
+    return new Promise((resolve) => {
+      resolve(this._dbm.supportsSubqueriesInInsSync());
     });
   }
-
+  
   /**
    * Checks if subqueries in quantified expressions are supported.
    *
    * @returns A promise that resolves to a boolean indicating if subqueries in quantified expressions are supported.
    */
   supportsSubqueriesInQuantifieds(): Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      this._dbm.supportsSubqueriesInQuantifieds(
-        (err: Error | null, result: boolean) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(result);
-          }
-        }
-      );
+    return new Promise((resolve) => {
+      resolve(this._dbm.supportsSubqueriesInQuantifiedsSync());
     });
   }
-
+  
   /**
    * Checks if table correlation names are supported.
    *
    * @returns A promise that resolves to a boolean indicating if table correlation names are supported.
    */
   supportsTableCorrelationNames(): Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      this._dbm.supportsTableCorrelationNames(
-        (err: Error | null, result: boolean) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(result);
-          }
-        }
-      );
+    return new Promise((resolve) => {
+      resolve(this._dbm.supportsTableCorrelationNamesSync());
     });
   }
-
+  
   /**
    * Checks if a specific transaction isolation level is supported.
    *
@@ -3391,72 +2785,45 @@ class DatabaseMetaData implements IDatabaseMetaData {
     if (!Number.isInteger(level)) {
       return Promise.reject(new Error("INVALID ARGUMENTS"));
     }
-
-    return new Promise((resolve, reject) => {
-      this._dbm.supportsTransactionIsolationLevel(
-        level,
-        (err: Error | null, result: boolean) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(result);
-          }
-        }
-      );
+  
+    return new Promise((resolve) => {
+      resolve(this._dbm.supportsTransactionIsolationLevelSync(level));
     });
   }
-
+  
   /**
    * Checks if transactions are supported.
    *
    * @returns A promise that resolves to a boolean indicating if transactions are supported.
    */
   supportsTransactions(): Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      this._dbm.supportsTransactions((err: Error | null, result: boolean) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(result);
-        }
-      });
+    return new Promise((resolve) => {
+      resolve(this._dbm.supportsTransactionsSync());
     });
   }
-
+  
   /**
    * Checks if SQL UNION is supported.
    *
    * @returns A promise that resolves to a boolean indicating if SQL UNION is supported.
    */
   supportsUnion(): Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      this._dbm.supportsUnion((err: Error | null, result: boolean) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(result);
-        }
-      });
+    return new Promise((resolve) => {
+      resolve(this._dbm.supportsUnionSync());
     });
   }
-
+  
   /**
    * Checks if SQL UNION ALL is supported.
    *
    * @returns A promise that resolves to a boolean indicating if SQL UNION ALL is supported.
    */
   supportsUnionAll(): Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      this._dbm.supportsUnionAll((err: Error | null, result: boolean) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(result);
-        }
-      });
+    return new Promise((resolve) => {
+      resolve(this._dbm.supportsUnionAllSync());
     });
   }
-
+  
   /**
    * Checks if updates are detected by calling the method ResultSet.rowUpdated.
    *
@@ -3467,38 +2834,23 @@ class DatabaseMetaData implements IDatabaseMetaData {
     if (!Number.isInteger(type)) {
       return Promise.reject(new Error("INVALID ARGUMENTS"));
     }
-
-    return new Promise((resolve, reject) => {
-      this._dbm.updatesAreDetected(
-        type,
-        (err: Error | null, result: boolean) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(result);
-          }
-        }
-      );
+  
+    return new Promise((resolve) => {
+      resolve(this._dbm.updatesAreDetectedSync(type));
     });
   }
-
+  
   /**
    * Checks if the database uses a file for each table.
    *
    * @returns A promise that resolves to a boolean indicating if the database uses a file for each table.
    */
   usesLocalFilePerTable(): Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      this._dbm.usesLocalFilePerTable((err: Error | null, result: boolean) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(result);
-        }
-      });
+    return new Promise((resolve) => {
+      resolve(this._dbm.usesLocalFilePerTableSync());
     });
   }
-
+  
   /**
    * Checks if the database stores tables in local files.
    *
@@ -3506,13 +2858,7 @@ class DatabaseMetaData implements IDatabaseMetaData {
    */
   usesLocalFiles(): Promise<boolean> {
     return new Promise((resolve, reject) => {
-      this._dbm.usesLocalFiles((err: Error | null, result: boolean) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(result);
-        }
-      });
+      resolve(this._dbm.usesLocalFilesSync())
     });
   }
 }

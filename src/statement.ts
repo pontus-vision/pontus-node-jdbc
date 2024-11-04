@@ -1,7 +1,6 @@
 /* jshint node: true */
 "use strict";
 
-import _ from "lodash";
 import ResultSet from "./resultset.js";
 import jinst from "./jinst.js";
 const java = jinst.getInstance();
@@ -64,36 +63,18 @@ class Statement {
   async executeUpdate(sql: string, arg1?: any): Promise<number> {
     const args = Array.from(arguments);
 
-    if (!(_.isString(args[0]) && _.isUndefined(args[1]))) {
+    if (!(typeof args[0] === "string" && args[1] === undefined)) {
       throw new Error("INVALID ARGUMENTS");
     }
 
     return new Promise((resolve, reject) => {
-      args.push((err: any, count: number) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(count);
-        }
-      });
-
-      this._s.executeUpdate.apply(this._s, args);
+       resolve(this._s.executeUpdateSync(sql))
     });
   }
 
   async executeQuery(sql: string): Promise<ResultSet> {
-    if (typeof sql !== "string") {
-      throw new Error("INVALID ARGUMENTS");
-    }
-
     return new Promise((resolve, reject) => {
-      this._s.executeQuery(sql, (err: any, resultset: any) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(new ResultSet(resultset));
-        }
-      });
+       resolve( new ResultSet(this._s.executeQuerySync(sql)));
     });
   }
 
@@ -104,11 +85,11 @@ class Statement {
 
     return new Promise((resolve, reject) => {
       const s = this._s;
-      s.execute(sql, (err: any, isResultSet: boolean) => {
+      s.executeSync(sql, (err: any, isResultSet: boolean) => {
         if (err) {
           reject(err);
         } else if (isResultSet) {
-          s.getResultSet((err: any, resultset: any) => {
+          s.getResultSetSync((err: any, resultset: any) => {
             if (err) {
               reject(err);
             } else {
@@ -116,7 +97,7 @@ class Statement {
             }
           });
         } else {
-          s.getUpdateCount((err: any, count: number) => {
+          s.getUpdateCountSync((err: any, count: number) => {
             if (err) {
               reject(err);
             } else {
@@ -130,13 +111,7 @@ class Statement {
 
   async getFetchSize(): Promise<number> {
     return new Promise((resolve, reject) => {
-      this._s.getFetchSize((err: any, fetchSize: number) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(fetchSize);
-        }
-      });
+      return resolve(this._s.getFetchSizeSync())
     });
   }
 
