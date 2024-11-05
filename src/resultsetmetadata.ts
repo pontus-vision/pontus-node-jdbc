@@ -7,25 +7,21 @@ class ResultSetMetaData {
 
   async getColumnCount(): Promise<number> {
     return new Promise((resolve, reject) => {
-      this._rsmd.getColumnCountSync((err: Error | null, count: number) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(count);
-        }
-      });
+      try {
+        resolve(this._rsmd.getColumnCountSync())
+      } catch (error) {
+        reject(error)
+      };
     });
   }
 
   async getColumnName(column: number): Promise<string> {
     return new Promise((resolve, reject) => {
-      this._rsmd.getColumnNameSync(column, (err: Error | null, name: string) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(name);
-        }
-      });
+      try {
+        resolve(this._rsmd.getColumnNameSync(column));
+      } catch (error) {
+        reject(error)
+      }
     });
   }
 }

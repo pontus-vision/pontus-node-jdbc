@@ -129,25 +129,21 @@ class ResultSet {
 
   async close(): Promise<void> {
     return new Promise((resolve, reject) => {
-      this._rs.close((err: Error | null) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve();
-        }
-      });
+      try {
+        resolve(this._rs.closeSync())
+      } catch (error) {
+        reject(error)
+      };
     });
   }
 
   async getMetaData(): Promise<ResultSetMetaData> {
     return new Promise((resolve, reject) => {
-      this._rs.getMetaData((err: Error | null, rsmd: any) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(new ResultSetMetaData(rsmd));
-        }
-      });
+      try {
+        resolve(this._rs.getMetaDataSync())
+      } catch (error) {
+        reject(error)
+      };
       // return resolve(new ResultSetMetaData(this._rs?.getMetaDataSync()))
     });
   }

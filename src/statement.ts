@@ -26,37 +26,31 @@ class Statement {
 
   async cancel(): Promise<void> {
     return new Promise((resolve, reject) => {
-      this._s.cancel((err: any) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve();
-        }
-      });
+      try {
+        resolve(this._s.cancelSync())
+      } catch (error) {
+        reject(error)
+      };
     });
   }
 
   async clearBatch(): Promise<void> {
     return new Promise((resolve, reject) => {
-      this._s.clearBatch((err: any) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve();
-        }
-      });
+        try {
+         resolve(this._s.clearBatchSync()) 
+        } catch (error) {
+          reject(error)
+        };
     });
   }
 
   async close(): Promise<void> {
     return new Promise((resolve, reject) => {
-      this._s.close((err: any) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve();
-        }
-      });
+      try {
+        resolve(this._s.closeSync());
+      } catch (error) {
+        reject(error)
+      }
     });
   }
 
@@ -68,13 +62,21 @@ class Statement {
     }
 
     return new Promise((resolve, reject) => {
-       resolve(this._s.executeUpdateSync(sql))
+      try {
+        resolve(this._s.executeUpdateSync(sql))
+      } catch (error) {
+        reject(error) 
+      }
     });
   }
 
   async executeQuery(sql: string): Promise<ResultSet> {
     return new Promise((resolve, reject) => {
+      try {
        resolve( new ResultSet(this._s.executeQuerySync(sql)));
+      } catch (error) {
+        reject(error)
+      }
     });
   }
 
@@ -82,108 +84,109 @@ class Statement {
     if (typeof sql !== "string") {
       throw new Error("INVALID ARGUMENTS");
     }
-
-    return new Promise((resolve, reject) => {
-      const s = this._s;
-      s.executeSync(sql, (err: any, isResultSet: boolean) => {
-        if (err) {
-          reject(err);
-        } else if (isResultSet) {
-          s.getResultSetSync((err: any, resultset: any) => {
-            if (err) {
-              reject(err);
-            } else {
-              resolve(new ResultSet(resultset));
-            }
-          });
-        } else {
-          s.getUpdateCountSync((err: any, count: number) => {
-            if (err) {
-              reject(err);
-            } else {
-              resolve(count);
-            }
-          });
+  
+    const s = this._s;
+  
+    // Execute the SQL command and determine if it returns a result set
+    const isResultSet = await new Promise<boolean>((resolve, reject) => {
+      try {
+        resolve(s.executeSync(sql))
+      } catch (error) {
+        reject(error)
+      }
+    });
+  
+    if (isResultSet) {
+      // If the result is a result set, retrieve it
+      const resultset = await new Promise<any>((resolve, reject) => {
+        try {
+          resolve(s.getResultSetSync())
+        } catch (error) {
+          reject(error)
+        };
+      });
+      return new ResultSet(resultset);
+    } else {
+      // Otherwise, get the update count
+      const count = await new Promise<number>((resolve, reject) => {
+        try {
+          resolve(s.getUpdateCountSync())
+        } catch (error) {
+          reject(error)
         }
       });
-    });
+      return count;
+    }
   }
+  
 
   async getFetchSize(): Promise<number> {
     return new Promise((resolve, reject) => {
-      return resolve(this._s.getFetchSizeSync())
+      try {
+        resolve(this._s.getFetchSizeSync())
+      } catch (error) {
+        reject(error)
+      }
     });
   }
 
   async setFetchSize(rows: number): Promise<void> {
     return new Promise((resolve, reject) => {
-      this._s.setFetchSize(rows, (err: any) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve();
-        }
-      });
+      try {
+        resolve(this._s.setFetchSizeSync(rows))
+      } catch (error) {
+        reject(error)
+      };
     });
   }
 
   async getMaxRows(): Promise<number> {
     return new Promise((resolve, reject) => {
-      this._s.getMaxRows((err: any, max: number) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(max);
-        }
-      });
+      try {
+        resolve(this._s.getMaxRowsSync())
+      } catch (error) {
+        reject(error)
+      };
     });
   }
 
   async setMaxRows(max: number): Promise<void> {
     return new Promise((resolve, reject) => {
-      this._s.setMaxRows(max, (err: any) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve();
-        }
-      });
+      try {
+        resolve(this._s.setMaxRowsSync(max))
+      } catch (error) {
+        reject(error)
+      };
     });
   }
 
   async getQueryTimeout(): Promise<number> {
     return new Promise((resolve, reject) => {
-      this._s.getQueryTimeout((err: any, queryTimeout: number) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(queryTimeout);
-        }
-      });
+      try {
+        resolve(this._s.getQueryTimeoutSync())
+      } catch (error) {
+        reject(error)
+      };
     });
   }
 
   async setQueryTimeout(seconds: number): Promise<void> {
     return new Promise((resolve, reject) => {
-      this._s.setQueryTimeout(seconds, (err: any) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve();
-        }
-      });
+      try {
+        resolve(this._s.setQueryTimeoutSync(seconds))
+      } catch (error) {
+        reject(error)
+      };
     });
   }
 
   async getGeneratedKeys(): Promise<ResultSet> {
     return new Promise((resolve, reject) => {
-      this._s.getGeneratedKeys((err: any, resultset: any) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(new ResultSet(resultset));
-        }
-      });
+      try {
+        resolve(this._s.getGeneratedKeysSync())
+      } catch (error) {
+        reject(error)
+      };
     });
   }
 }

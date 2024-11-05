@@ -15,64 +15,71 @@ class PreparedStatement extends Statement {
 
   async addBatch(): Promise<void> {
     return new Promise((resolve, reject) => {
-      this._ps.addBatch((err: any) => {
-        if (err) return reject(err);
-        resolve();
-      });
+      try {
+        resolve(this._ps.addBatchSync());
+      } catch (error) {
+        reject(error)
+      }
     });
   }
 
   async clearParameters(): Promise<void> {
     return new Promise((resolve, reject) => {
-      this._ps.clearParameters((err: any) => {
-        if (err) return reject(err);
-        resolve();
-      });
+      try {
+        resolve(this._ps.clearParametersSync())
+      } catch (error) {
+        reject(error)
+      }
     });
   }
 
   async execute(): Promise<any> {
     return new Promise((resolve, reject) => {
-      this._ps.execute((err: any, result: any) => {
-        if (err) {
-          console.error(err);
-          return reject(err);
-        }
-        resolve(result);
-      });
+      try {
+        resolve(this._ps.executeSync())
+      } catch (error) {
+        reject(error)
+      }
     });
   }
 
   async executeBatch(): Promise<any> {
     return new Promise((resolve, reject) => {
-      this._ps.executeBatch((err: any, result: any) => {
-        if (err) {
-          console.error(err);
-          return reject(err);
-        }
-        resolve(result);
-      });
+      try {
+        resolve(this._ps.executeBatchSync())
+      } catch (error) {
+        reject(error)
+      }
     });
   }
 
   async executeQuery(): Promise<ResultSet> {
     return new Promise((resolve, reject) => {
-       resolve( new ResultSet(this._ps.executeQuerySync()));
+      try {
+        resolve( new ResultSet(this._ps.executeQuerySync()));
+      } catch (error) {
+        reject(error)
+      }
     });
   }
 
   async executeUpdate(): Promise<any> {
     return new Promise((resolve, reject) => {
-     resolve(this._ps.executeUpdateSync())
+      try {
+        resolve(this._ps.executeUpdateSync())
+      } catch (error) {
+        reject(error)
+      }
     });
   }
 
   async getMetaData(): Promise<ResultSetMetaData> {
     return new Promise((resolve, reject) => {
-      this._ps.getMetaData((err: any, result: any) => {
-        if (err) return reject(err);
-        resolve(new ResultSetMetaData(result));
-      });
+      try {
+        resolve(this._ps.getMetaDataSync());
+      } catch (error) {
+        reject(error)
+      }
     });
   }
 
@@ -90,10 +97,11 @@ class PreparedStatement extends Statement {
 
   async setBigDecimal(index: number, val: any): Promise<void> {
     return new Promise((resolve, reject) => {
-      this._ps.setBigDecimal(index, val, (err: any) => {
-        if (err) return reject(err);
-        resolve();
-      });
+      try {
+        resolve(this._ps.setBigDecimalSync(index, val))
+      } catch (error) {
+        reject(error)
+      };
     });
   }
 
@@ -107,28 +115,31 @@ class PreparedStatement extends Statement {
 
   async setBoolean(index: number, val: boolean): Promise<void> {
     return new Promise((resolve, reject) => {
-      this._ps.setBoolean(index, val, (err: any) => {
-        if (err) return reject(err);
-        resolve();
-      });
+      try {
+        resolve(this._ps.setBooleanSync(index, val));
+      } catch (error) {
+        reject(error) 
+      }
     });
   }
 
   async setByte(index: number, val: number): Promise<void> {
     return new Promise((resolve, reject) => {
-      this._ps.setByte(index, val, (err: any) => {
-        if (err) return reject(err);
-        resolve();
-      });
+      try {
+        resolve(this._ps.setByteSync(index, val))
+      } catch (error) {
+        reject(error)
+      };
     });
   }
 
   async setBytes(index: number, val: Buffer): Promise<void> {
     return new Promise((resolve, reject) => {
-      this._ps.setBytes(index, val, (err: any) => {
-        if (err) return reject(err);
-        resolve();
-      });
+      try {
+        resolve(this._ps.setBytesSync(index, val))
+      } catch (error) {
+        reject(error)
+      };
     });
   }
 
@@ -143,76 +154,85 @@ class PreparedStatement extends Statement {
   async setDate(index: number, val: any, calendar?: any): Promise<void> {
     return new Promise((resolve, reject) => {
       if (calendar === null) {
-        this._ps.setDate(index, val, (err: any) => {
-          if (err) return reject(err);
-          resolve();
-        });
+        try {
+          resolve(this._ps.setDateSync(index, val));
+        } catch (error) {
+          reject(error)
+        }
       } else {
-        this._ps.setDate(index, val, calendar, (err: any) => {
-          if (err) return reject(err);
-          resolve();
-        });
+        try {
+          resolve(this._ps.setDateSync(index, val, calendar))
+        } catch (error) {
+          reject(error)
+        }
       }
     });
   }
 
   async setDouble(index: number, val: number): Promise<void> {
     return new Promise((resolve, reject) => {
-      this._ps.setDouble(index, val, (err: any) => {
-        if (err) return reject(err);
-        resolve();
-      });
+      try {
+        resolve(this._ps.setDoubleSync(index, val))
+      } catch (error) {
+        reject(error)
+      }
     });
   }
 
   async setFloat(index: number, val: number): Promise<void> {
     return new Promise((resolve, reject) => {
-      this._ps.setFloat(index, val, (err: any) => {
-        if (err) return reject(err);
-        resolve();
-      });
+      try {
+        resolve(this._ps.setFloatSync(index, val))
+      } catch (error) {
+        reject(error)
+      };
     });
   }
 
   async setInt(index: number, val: number): Promise<void> {
     return new Promise((resolve, reject) => {
-      this._ps.setInt(index, val, (err: any) => {
-        if (err) return reject(err);
-        resolve();
-      });
+      try {
+        resolve(this._ps.setIntSync(index, val))
+      } catch (error) {
+        reject(error)
+      };
     });
   }
 
   async setLong(index: number, val: number): Promise<void> {
     return new Promise((resolve, reject) => {
-      this._ps.setLong(index, val, (err: any) => {
-        if (err) return reject(err);
-        resolve();
-      });
+      try {
+        resolve(this._ps.setLongSync(index, val))
+      } catch (error) {
+        reject(error)
+      };
     });
   }
 
   async setString(index: number, val: string): Promise<void> {
     return new Promise((resolve, reject) => {
-      this._ps.setString(index, val, (err: any) => {
-        if (err) return reject(err);
-        resolve();
-      });
+      try {
+        resolve(this._ps.setStringSync(index, val))
+      } catch (error) {
+        reject(error)
+      };
     });
   }
 
   async setTime(index: number, val: any, calendar?: any): Promise<void> {
     return new Promise((resolve, reject) => {
       if (calendar === null) {
-        this._ps.setTime(index, val, (err: any) => {
-          if (err) return reject(err);
-          resolve();
-        });
+        try {
+          resolve(this._ps.setTimeSync(index, val))
+        } catch (error) {
+          reject(error)
+        }
       } else {
-        this._ps.setTime(index, val, calendar, (err: any) => {
-          if (err) return reject(err);
-          resolve();
-        });
+        try {
+          resolve(this._ps.setTimeSync(index, val, calendar))
+        } catch (error) {
+          reject(error)
+        };
       }
     });
   }
@@ -220,15 +240,17 @@ class PreparedStatement extends Statement {
   async setTimestamp(index: number, val: any, calendar?: any): Promise<void> {
     return new Promise((resolve, reject) => {
       if (calendar === null) {
-        this._ps.setTimestamp(index, val, (err: any) => {
-          if (err) return reject(err);
-          resolve();
-        });
+        try {
+          resolve(this._ps.setTimestampSync(index, val))
+        } catch (error) {
+          reject(error)
+        };
       } else {
-        this._ps.setTimestamp(index, val, calendar, (err: any) => {
-          if (err) return reject(err);
-          resolve();
-        });
+        try {
+          resolve(this._ps.setTimestampSync(index, val, calendar))
+        } catch (error) {
+          reject(error)
+        };
       }
     });
   }
