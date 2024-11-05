@@ -99,21 +99,22 @@ class Jinst implements IJinst{
   }
 
   public callStaticMethod(className: string, methodName: string, ...args: any[]): any {
-      return java.callStaticMethod.apply(java, [className, methodName, ...args])
+    return java.callStaticMethodSync(className, methodName, ...args);
+    
   }
 
   public callStaticMethodSync(className: string, methodName: string, ...args: any[]): any {
-    return java.callStaticMethod.apply(java, [className, methodName, ...args])
-}
-public import(className: string): any {
-  return java.import(className); // Assuming `java.import` exists in the library
-}
+    return java.callStaticMethodSync.apply(java, [className, methodName, ...args])
+  }
+  public import(className: string): any {
+    return java.import(className); // Assuming `java.import` exists in the library
+  }
 
-public newInstance(className: string, ...args: any[]): Promise<any> {
-  return new Promise((resolve, reject) => {
-    resolve(java.newInstance(className, ...args));
-  });
-}
+  public newInstance(className: string, ...args: any[]): Promise<any> {
+    return new Promise((resolve, reject) => {
+      resolve(java.newInstance(className, ...args));
+    });
+  }
 
   // Event emitter
   public events = new EventEmitter();
