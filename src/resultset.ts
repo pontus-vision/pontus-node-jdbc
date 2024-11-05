@@ -140,11 +140,10 @@ class ResultSet {
   async getMetaData(): Promise<ResultSetMetaData> {
     return new Promise((resolve, reject) => {
       try {
-        resolve(this._rs.getMetaDataSync())
+       resolve(new ResultSetMetaData(this._rs?.getMetaDataSync()))
       } catch (error) {
         reject(error)
       };
-      // return resolve(new ResultSetMetaData(this._rs?.getMetaDataSync()))
     });
   }
 }
