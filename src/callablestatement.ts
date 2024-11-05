@@ -1,4 +1,3 @@
-import _ from "lodash";
 import PreparedStatement from "./preparedstatement.js";
 
 export class CallableStatement extends PreparedStatement {

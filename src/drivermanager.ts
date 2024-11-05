@@ -1,7 +1,6 @@
-import _ from "lodash";
-import jinst from "./jinst.js";
+import Jinst from "./jinst.js";
 
-const java = jinst.getInstance();
+const java = Jinst.getInstance();
 
 const DM = "java.sql.DriverManager";
 
@@ -40,13 +39,14 @@ const driverManager: DriverManager = {
     );
 
     const validArgs =
-      args[0] &&
-      // propsoruser and password can both be falsey
-      (!(args[1] || args[2]) ||
+    args[0] &&
+    // propsoruser and password can both be falsey
+    (!(args[1] || args[2]) ||
         // propsoruser and password can both be strings
-        (_.isString(args[1]) && _.isString(args[2])) ||
+        (typeof args[1] === 'string' && typeof args[2] === 'string') ||
         // propsoruser can be an object if password is falsey
-        (_.isObject(args[1]) && !args[2]));
+        (typeof args[1] === 'object' && !args[2]));
+
 
     if (!validArgs) {
       throw new Error("INVALID ARGUMENTS");
@@ -73,10 +73,11 @@ const driverManager: DriverManager = {
     ) as DriverManagerArgs;
 
     const validArgs =
-      args[0] &&
-      (!(args[1] || args[2]) ||
-        (_.isString(args[1]) && _.isString(args[2])) ||
-        (_.isObject(args[1]) && !args[2]));
+    args[0] &&
+    (!(args[1] || args[2]) ||
+        (typeof args[1] === 'string' && typeof args[2] === 'string') ||
+        (typeof args[1] === 'object' && args[1] !== null && !args[2]));
+
 
     if (!validArgs) {
       throw new Error("INVALID ARGUMENTS");

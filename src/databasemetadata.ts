@@ -1,9 +1,11 @@
 import ResultSet from "./resultset.js";
 import Connection from "./connection.js";
-import jinst from "./jinst.js";
+import Jinst from "./jinst.js";
 
-const java = jinst.getInstance();
+const java = Jinst.getInstance();
 
+// Assuming these types are defined elsewhere in your codebase
+type Callback<T> = (err: Error | null, result: T) => void;
 enum RowIdLifetime {
   ROWID_UNSUPPORTED = 0, // The database does not support ROWIDs
   ROWID_VALID_FOREVER = 1, // The ROWID is valid forever
@@ -2374,11 +2376,11 @@ const staticAttrs: string[] = [
   "versionColumnUnknown",
 ];
 
-jinst.events.once("initialized", () => {
+Jinst.getInstance().events.once("initialized", () => {
   // Assuming 'java' is an external library object with a method to get static field values
   staticAttrs.forEach((attr) => {
     (DatabaseMetaData as any)[attr as keyof DatabaseMetaData] =
-      java.getStaticFieldValue("java.sql.DatabaseMetaData", attr);
+      (java as typeof java).getStaticFieldValue("java.sql.DatabaseMetaData", attr);
   });
 });
 

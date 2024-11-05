@@ -1,16 +1,16 @@
-import _ from "lodash";
-import jinst from "./jinst.js";
+import Jinst from "./jinst.js";
 import { CallableStatement } from "./callablestatement.js";
 import PreparedStatement from "./preparedstatement.js";
 import DatabaseMetaData from "./databasemetadata.js";
 import Statement from "./statement.js";
 import SQLWarning from "./sqlwarning.js";
 
-const java = jinst.getInstance();
+const java = Jinst.getInstance();
 
-if (!jinst.isJvmCreated()) {
-  jinst.addOption("-Xrs");
+if (!java.isJvmCreated()) {
+  java.addOption("-Xrs");
 }
+
 type ConnectionType = {
   clearWarnings: (callback: (err: Error | null) => void) => void;
   close: (callback: (err: Error | null) => void) => void;

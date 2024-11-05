@@ -1,11 +1,10 @@
-import _ from 'lodash';
 import jinst from './jinst.js';
 import ResultSetMetaData from './resultsetmetadata.js';
 
 const java = jinst.getInstance();
 
-if (!jinst.isJvmCreated()) {
-  jinst.addOption('-Xrs');
+if (!jinst.getInstance().isJvmCreated()) {
+  jinst.getInstance().addOption('-Xrs');
 }
 
 interface ColumnMetaData {
@@ -85,47 +84,50 @@ class ResultSet {
     const colsmetadata: { label: string; type: any }[] = [];
 
     const count = await rsmd.getColumnCount();
-    
-    _.each(_.range(1, count + 1), (i) => {
-      colsmetadata.push({
-        label: rsmd._rsmd.getColumnLabelSync(i),
-        type: rsmd._rsmd.getColumnTypeSync(i),
-      });
-    });
+
+    // Use a for loop instead of Lodash's each and range
+    for (let i = 1; i <= count; i++) {
+        colsmetadata.push({
+            label: rsmd._rsmd.getColumnLabelSync(i),
+            type: rsmd._rsmd.getColumnTypeSync(i),
+        });
+    }
 
     return {
-      labels: _.map(colsmetadata, 'label'),
-      types: _.map(colsmetadata, 'type'),
-      rows: {
-        next: () => {
-          try {
-            const nextRow = this._rs.nextSync();
-            if (!nextRow) {
-              return { done: true };
-            }
+        labels: colsmetadata.map(col => col.label),
+        types: colsmetadata.map(col => col.type),
+        rows: {
+            next: () => {
+                try {
+                    const nextRow = this._rs.nextSync();
+                    if (!nextRow) {
+                        return { done: true };
+                    }
 
-            const result: Record<string, any> = {};
-            _.each(_.range(1, count + 1), (i) => {
-              const cmd = colsmetadata[i - 1];
-              const type = this._types[cmd.type] || 'String';
-              const getter = 'get' + (type === 'BigDecimal' ? 'Double' : type) + 'Sync';
+                    const result: Record<string, any> = {};
+                    // Use a for loop instead of Lodash's each and range
+                    for (let i = 1; i <= count; i++) {
+                        const cmd = colsmetadata[i - 1];
+                        const type = this._types[cmd.type] || 'String';
+                        const getter = 'get' + (type === 'BigDecimal' ? 'Double' : type) + 'Sync';
 
-              if (type === 'Date' || type === 'Time' || type === 'Timestamp') {
-                const dateVal = this._rs[getter](cmd.label);
-                result[cmd.label] = dateVal ? dateVal.toString() : null;
-              } else {
-                result[cmd.label] = this._rs[getter](cmd.label);
-              }
-            });
+                        if (type === 'Date' || type === 'Time' || type === 'Timestamp') {
+                            const dateVal = this._rs[getter](cmd.label);
+                            result[cmd.label] = dateVal ? dateVal.toString() : null;
+                        } else {
+                            result[cmd.label] = this._rs[getter](cmd.label);
+                        }
+                    }
 
-            return { value: result, done: false };
-          } catch (error: any) {
-            throw new Error(error);
-          }
+                    return { value: result, done: false };
+                } catch (error: any) {
+                    throw new Error(error);
+                }
+            },
         },
-      },
     };
-  }
+}
+
 
   async close(): Promise<void> {
     return new Promise((resolve, reject) => {

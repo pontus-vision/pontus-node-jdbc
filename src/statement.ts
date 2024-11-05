@@ -2,8 +2,8 @@
 "use strict";
 
 import ResultSet from "./resultset.js";
-import jinst from "./jinst.js";
-const java = jinst.getInstance();
+import Jinst from "./jinst.js";
+const java = Jinst.getInstance();
 
 class Statement {
   private _s: any;
@@ -192,7 +192,7 @@ class Statement {
 }
 
 // Initialize constants like in the original code
-jinst.events.once("initialized", function onInitialized() {
+Jinst.getInstance().events.once("initialized", function onInitialized() {
   Statement.CLOSE_CURRENT_RESULT = java.getStaticFieldValue(
     "java.sql.Statement",
     "CLOSE_CURRENT_RESULT"
