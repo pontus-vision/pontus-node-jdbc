@@ -28,7 +28,12 @@ export interface PoolConfig {
   logging?: LoggingConfig; // default: { level: "error" }
 }
 
-
+interface PoolStatus {
+  available?: number
+ reserved?: number 
+  pool?: Connection[]
+  rpool?: Connection[] 
+}
 const java = Jinst.getInstance();
 
 if (!Jinst.getInstance().isJvmCreated()) {
@@ -146,8 +151,8 @@ class Pool {
     this._logging = config.logging || { level: "error" };
   }
 
-  async status(): Promise<any> {
-    const status: any = {};
+  async status(): Promise<PoolStatus> {
+    const status: PoolStatus = {};
     status.available = this._pool.length;
     status.reserved = this._reserved.length;
     status.pool = this.connStatus([], this._pool);
