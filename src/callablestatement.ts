@@ -22,7 +22,7 @@ export class CallableStatement extends PreparedStatement {
     }
   }
 
-  async getBigDecimal(arg1: number | string): Promise<any> {
+  async getBigDecimal(arg1: number | string): Promise<number> {
     if (typeof arg1 === "number" || typeof arg1 === "string") {
       return new Promise<any>((resolve, reject) => {
         try {
@@ -36,7 +36,7 @@ export class CallableStatement extends PreparedStatement {
     }
   }
 
-  async getBlob(arg1: number | string): Promise<any> {
+  async getBlob(arg1: number | string): Promise<Blob> {
     if (typeof arg1 === "number" || typeof arg1 === "string") {
       return new Promise<any>((resolve, reject) => {
         try {
