@@ -4,6 +4,9 @@ import Jinst from "./jinst.js";
 import dm from "./drivermanager.js";
 import Connection from "./connection.js";
 
+interface ConnStatus {
+  uuid: string; closed: boolean; readonly?: boolean; valid?: boolean
+}
 
 interface KeepAliveConfig {
   enabled: boolean;
@@ -31,9 +34,18 @@ export interface PoolConfig {
 interface PoolStatus {
   available?: number
  reserved?: number 
-  pool?: Connection[]
-  rpool?: Connection[] 
+  pool?: ConnStatus[]
+  rpool?: ConnStatus[],
 }
+
+interface PoolConnStatus {
+  conn: Connection,
+  closed: boolean,
+  readonly: boolean,
+  valid: boolean
+  uuid: string
+}
+
 const java = Jinst.getInstance();
 
 if (!Jinst.getInstance().isJvmCreated()) {
@@ -160,10 +172,10 @@ class Pool {
     return status;
   }
 
-  private connStatus(acc: any[], pool: any[]): any[] {
+  private connStatus(acc: ConnStatus[], pool: PoolConnStatus[]): ConnStatus[] {
     return pool.reduce((conns, connobj) => {
         const conn = connobj.conn;
-        const closed = conn.isClosedSync();
+        const closed = conn.isClosedSync() as boolean;
         const readonly = conn.isReadOnlySync();
         const valid = conn.isValidSync(1000);
         

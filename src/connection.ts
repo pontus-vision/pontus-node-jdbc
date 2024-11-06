@@ -143,6 +143,7 @@ class Connection {
     this._txniso = this.initializeTxnIso();
   }
 
+
   private initializeTxnIso(): { [key: number]: string } {
     const txniso: { [key: number]: string } = {};
     txniso[
@@ -175,6 +176,17 @@ class Connection {
     return txniso;
   }
 
+  isClosedSync(): boolean{
+    return this.isClosedSync()
+  }
+
+  isReadOnlySync():boolean {
+    return this.isReadOnlySync()
+  }
+
+  isValidSync(val: number):boolean {
+    return this.isValidSync(val)
+  }
   abort(executor: any): Promise<void> {
     return Promise.reject(new Error("NOT IMPLEMENTED"));
   }
