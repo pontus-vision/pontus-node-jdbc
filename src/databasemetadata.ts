@@ -117,7 +117,7 @@ class DatabaseMetaData implements IDatabaseMetaData {
     });
   }
 
-  async allProceduresAreCallable(): Promise<any> {
+  async allProceduresAreCallable(): Promise<boolean> {
     return new Promise((resolve, reject) => {
       try {
         resolve(this._dbm.allProceduresAreCallableSync());
