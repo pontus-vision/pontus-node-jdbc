@@ -3,6 +3,7 @@ import * as console from "console";
 import Jinst from "./jinst.js";
 import dm from "./drivermanager.js";
 import Connection from "./connection.js";
+import Statement from "./statement.js";
 
 interface ConnStatus {
   uuid: string; closed: boolean; readonly?: boolean; valid?: boolean
@@ -11,12 +12,12 @@ interface ConnStatus {
 interface ConnObj {
     uuid: string;
     conn: Connection;
-    keepalive: boolean | NodeJS.Timeout;
-    lastIdle: number | undefined;
+    keepalive: number | boolean;
+    lastIdle: number | undefined ;
   }
 
 interface KeepAliveConfig {
-  enabled: boolean;
+  enabled: boolean ;
   interval: number; // in milliseconds
   query: string;
 }
@@ -59,14 +60,21 @@ if (!Jinst.getInstance().isJvmCreated()) {
   Jinst.getInstance().addOption("-Xrs");
 }
 
-const keepalive = (conn: any, query: string): void => {
-  conn.createStatement((err: Error, statement: any) => {
-    if (err) return console.error(err);
-    statement.execute(query, (err: Error, result: any) => {
-      if (err) return console.error(err);
-      console.debug(`${new Date().toUTCString()} - Keep-Alive`);
-    });
-  });
+const keepalive = async (conn: Connection, query: string): Promise<void> => {
+  try {
+    const connection = await conn.createStatement() as Statement
+    connection.execute(query)
+
+  } catch (error) {
+    console.error(error);
+  }
+  // conn.createStatementSync((err: Error, statement: any) => {
+  //   if (err) 
+  //   statement.execute(query, (err: Error, result: any) => {
+  //     if (err) return console.error(err);
+  //     console.debug(`${new Date().toUTCString()} - Keep-Alive`);
+  //   });
+  // });
 };
 
 const addConnection = async (
@@ -101,7 +109,7 @@ const addConnection = async (
 const addConnectionSync = (
   url: string,
   props: any,
-  ka: { enabled: boolean; interval: number; query: string },
+  ka: { enabled: boolean ; interval: number; query: string },
   maxIdle: number | null
 ) => {
   const conn = dm.getConnectionSync(url, props);
