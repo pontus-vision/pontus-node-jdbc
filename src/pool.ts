@@ -8,6 +8,13 @@ interface ConnStatus {
   uuid: string; closed: boolean; readonly?: boolean; valid?: boolean
 }
 
+interface ConnObj {
+    uuid: string;
+    conn: Connection;
+    keepalive: boolean | NodeJS.Timeout;
+    lastIdle: number | undefined;
+  }
+
 interface KeepAliveConfig {
   enabled: boolean;
   interval: number; // in milliseconds
@@ -98,17 +105,13 @@ const addConnectionSync = (
   maxIdle: number | null
 ) => {
   const conn = dm.getConnectionSync(url, props);
-  const connobj: {
-    uuid: string;
-    conn: Connection;
-    keepalive: boolean | NodeJS.Timeout;
-    lastIdle?: number;
-  } = {
+  const connobj: ConnObj = {
     uuid: uuidv4(),
     conn: new Connection(conn),
     keepalive: ka.enabled
       ? setInterval(keepalive, ka.interval, conn, ka.query)
       : false,
+      lastIdle: undefined
   };
 
   if (maxIdle) {
@@ -272,15 +275,16 @@ private async _addConnectionsOnInitialize(): Promise<void> {
     this.closeIdleConnectionsInArray(this._reserved, this._maxidle);
   }
 
-  private closeIdleConnectionsInArray(array: any[], maxIdle: number): void {
+  private closeIdleConnectionsInArray(array: ConnObj[], maxIdle: number): void {
     const time = new Date().getTime();
     const maxLastIdle = time - maxIdle;
 
     for (let i = array.length - 1; i >= 0; i--) {
       const conn = array[i];
       if (typeof conn === "object" && conn.conn !== null) {
+        if(!conn.lastIdle) return
         if (conn.lastIdle < maxLastIdle) {
-          conn.conn.close((err: Error) => {});
+          conn.conn.close();
           array.splice(i, 1);
         }
       }
