@@ -38,7 +38,7 @@ export class CallableStatement extends PreparedStatement {
 
   async getBlob(arg1: number | string): Promise<Blob> {
     if (typeof arg1 === "number" || typeof arg1 === "string") {
-      return new Promise<any>((resolve, reject) => {
+      return new Promise<Blob>((resolve, reject) => {
         try {
           resolve(this._cs.getBlobSync(arg1))
         } catch (error) {
