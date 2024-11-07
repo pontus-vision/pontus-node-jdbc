@@ -56,7 +56,7 @@ const driverManager: DriverManager = {
 
     return new Promise((resolve, reject) => {
     
-      java.callStaticMethod.apply(java, [DM, "getConnection", ...args]);
+      java.callStaticMethodSync.apply(java, [DM, "getConnection", ...args]);
     });
   },
 
@@ -88,34 +88,19 @@ const driverManager: DriverManager = {
 
   async getLoginTimeout(): Promise<number> {
     return new Promise((resolve, reject) => {
-      java.callStaticMethod(
-        DM,
-        "getLoginTimeout",
-        (err: Error | null, seconds: number) => {
-          if (err) reject(err);
-          else resolve(seconds);
-        }
-      );
+      resolve(java.callStaticMethodSync(DM, "getLoginTimeout"));
     });
   },
 
   async registerDriver(driver: any): Promise<void> {
     return new Promise((resolve, reject) => {
-      java.callStaticMethod(
-        DM,
-        "registerDriver",
-        driver,
-        (err: Error | null) => {
-          if (err) reject(err);
-          else resolve();
-        }
-      );
+      resolve(java.callStaticMethodSync(DM, "registerDriver", driver))
     });
   },
 
   async setLoginTimeout(seconds: number): Promise<boolean> {
     return new Promise((resolve, reject) => {
-      java.callStaticMethod(
+      java.callStaticMethodSync(
         DM,
         "setLoginTimeout",
         seconds
