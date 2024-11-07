@@ -132,7 +132,8 @@ type ConnectionType = {
   setSchemaSync(schema: string): void;
   setTransactionIsolationSync(txniso: number): void;
   setTypeMapSync(map: any): void;
-
+  commitSync(): Promise<void> 
+  createStatementSync(arg1?: number, arg2?: number, arg3?: number): Promise<any>
 };
 
 class Connection {
@@ -240,7 +241,7 @@ class Connection {
     return new Promise((resolve, reject) => {
       try {
         const args = [arg1, arg2, arg3].filter((arg) => arg !== undefined); // Filter out undefined arguments
-        const statement = this._conn?.createStatement(...args); // Invoke without callback
+        const statement = this._conn?.createStatementSync(...args); // Invoke without callback
         resolve(new Statement(statement)); // Assume createStatement returns a statement
       } catch (err) {
         reject(err); // Handle any errors that occur during the call
