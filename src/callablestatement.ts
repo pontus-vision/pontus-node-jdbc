@@ -24,7 +24,7 @@ export class CallableStatement extends PreparedStatement {
 
   async getBigDecimal(arg1: number | string): Promise<number> {
     if (typeof arg1 === "number" || typeof arg1 === "string") {
-      return new Promise<any>((resolve, reject) => {
+      return new Promise<number>((resolve, reject) => {
         try {
           resolve(this._cs.getBigDecimalSync(arg1));
         } catch (error) {
@@ -135,7 +135,7 @@ export class CallableStatement extends PreparedStatement {
     if (typeof arg1 === "number" || typeof arg1 === "string") {
       return new Promise<string>((resolve, reject) => {
         try {
-          resolve(this._cs.getString(arg1));
+          resolve(this._cs.getStringSync(arg1));
         } catch (error) {
           reject(error) 
         }
@@ -149,7 +149,7 @@ export class CallableStatement extends PreparedStatement {
     if (typeof arg1 === "number" || typeof arg1 === "string") {
       return new Promise<any>((resolve, reject) => {
         try {
-          resolve(this._cs.getTime(arg1));
+          resolve(this._cs.getTimeSync(arg1));
           
         } catch (error) {
           reject(error)
@@ -164,7 +164,7 @@ export class CallableStatement extends PreparedStatement {
     if (typeof arg1 === "number" || typeof arg1 === "string") {
       return new Promise<any>((resolve, reject) => {
         try {
-        resolve(this._cs.getTimestamp(arg1))  
+        resolve(this._cs.getTimestampSync(arg1))  
         } catch (error) {
           reject(error)
         }
