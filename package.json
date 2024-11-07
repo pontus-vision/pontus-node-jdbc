@@ -2,11 +2,13 @@
   "name": "pontus-node-jdbc",
   "version": "1.0.0",
   "description": "A TypeScript wrapper for JDBC connections to work with TypeScript applications",
+  "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1",
+    "jest": "/usr/bin/env NODE_ENV=test NODE_TLS_REJECT_UNAUTHORIZED=0  jest --coverage --detectOpenHandles --runInBand  --config jest.config.js ",
     "prepublishOnly": "npm run build"
   },
   "repository": {
@@ -23,12 +25,16 @@
   "license": "MIT",
   "dependencies": {
     "java": "^0.14.0",
+    "jest": "^29.7.0",
+    "ts-node": "^10.9.2",
+    "uuid": "^11.0.2",
     "winston": "^3.3.3"
   },
   "devDependencies": {
     "@types/java": "^0.9.5",
     "@types/node": "^18.19.63",
     "@types/uuid": "^10.0.0",
+    "tsx": "^4.19.2",
     "typescript": "^5.x"
   }
 }
