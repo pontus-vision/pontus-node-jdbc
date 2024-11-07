@@ -4,8 +4,6 @@ import Jinst from "./jinst.js";
 
 const java = Jinst.getInstance();
 
-// Assuming these types are defined elsewhere in your codebase
-type Callback<T> = (err: Error | null, result: T) => void;
 enum RowIdLifetime {
   ROWID_UNSUPPORTED = 0, // The database does not support ROWIDs
   ROWID_VALID_FOREVER = 1, // The ROWID is valid forever

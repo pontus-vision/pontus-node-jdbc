@@ -132,6 +132,7 @@ type ConnectionType = {
   setSchemaSync(schema: string): void;
   setTransactionIsolationSync(txniso: number): void;
   setTypeMapSync(map: any): void;
+
 };
 
 class Connection {
@@ -205,10 +206,13 @@ class Connection {
 
   commit(): Promise<void> {
     return new Promise((resolve, reject) => {
-      this._conn?.commit((err: Error | null) => {
-        if (err) reject(err);
-        else resolve();
-      });
+      resolve(this._conn?.commitSync());
+    });
+  }
+
+  commitSync(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      resolve(this._conn?.commitSync());
     });
   }
 
