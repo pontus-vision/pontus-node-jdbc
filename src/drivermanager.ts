@@ -1,5 +1,7 @@
 import Jinst from "./jinst.js";
 
+
+import Connection from "./connection.js";
 const java = Jinst.getInstance();
 
 const DM = "java.sql.DriverManager";
@@ -33,7 +35,7 @@ const driverManager: DriverManager = {
     url: string,
     propsoruser?: string | Record<string, any>,
     password?: string
-  ): Promise<any> {
+  ): Promise<Connection> {
     const args = [url, propsoruser, password].filter(
       (arg) => arg !== undefined
     );
@@ -53,12 +55,7 @@ const driverManager: DriverManager = {
     }
 
     return new Promise((resolve, reject) => {
-      const callback = (err: Error | null, conn: any) => {
-        if (err) reject(err);
-        else resolve(conn);
-      };
-
-      args.push(callback);
+    
       java.callStaticMethod.apply(java, [DM, "getConnection", ...args]);
     });
   },
@@ -121,11 +118,7 @@ const driverManager: DriverManager = {
       java.callStaticMethod(
         DM,
         "setLoginTimeout",
-        seconds,
-        (err: Error | null) => {
-          if (err) reject(err);
-          else resolve(true);
-        }
+        seconds
       );
     });
   },
