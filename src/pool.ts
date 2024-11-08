@@ -4,6 +4,7 @@ import Jinst from "./jinst.js";
 import dm from "./drivermanager.js";
 import Connection from "./connection.js";
 import Statement from "./statement.js";
+import { ConnectOpts } from "net";
 
 interface ConnStatus {
   uuid: string; closed: boolean; readonly?: boolean; valid?: boolean
@@ -295,11 +296,11 @@ private async _addConnectionsOnInitialize(): Promise<void> {
           conn.conn.close();
           array.splice(i, 1);
         }
-        Type}
+       }
     }
   }
 
-  async release(conn: any): Promise<void> {
+  async release(conn: ConnObj): Promise<void> {
     if (typeof conn === "object") {
         const uuid = conn.uuid;
 
