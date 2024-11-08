@@ -10,7 +10,7 @@ interface ConnStatus {
   uuid: string; closed: boolean; readonly?: boolean; valid?: boolean
 }
 
-interface ConnObj {
+export interface ConnObj {
     uuid: string;
     conn: Connection;
     keepalive: number | boolean;
@@ -55,7 +55,11 @@ interface PoolConnStatus {
   uuid: string
 }
 
+
 const java = Jinst.getInstance();
+
+export interface IConnection extends ConnObj, Connection {}
+
 
 if (!Jinst.getInstance().isJvmCreated()) {
   Jinst.getInstance().addOption("-Xrs");
@@ -237,7 +241,7 @@ private async _addConnectionsOnInitialize(): Promise<void> {
     }
   }
 
-  async reserve(): Promise<{[key: string]: any,conn: Connection}> {
+  async reserve(): Promise<{[key: string]: any,conn: IConnection}> {
     this._closeIdleConnections();
 
     let conn = null;
