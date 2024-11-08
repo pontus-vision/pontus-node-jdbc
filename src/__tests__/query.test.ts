@@ -1,10 +1,11 @@
 import { beforeEach, describe, it } from "node:test";
 
 export const classPath = process.env['CLASSPATH']?.split(',');
-import Pool from '../pool.js'
+import Pool, { ConnObj, IConnection } from '../pool.js'
 import Connection from '../connection.js';
 import JDBC from '../jdbc.js'; // Use default import
 import Jinst from '../jinst.js'; // Use default import
+
 
 describe('testing queries', ()=>{
     const config= {
@@ -16,7 +17,7 @@ describe('testing queries', ()=>{
         },
     };
     const jdbc = new JDBC(config);
-    const createConnection = async():Promise<Connection> => {
+    const createConnection = async():Promise<IConnection> => {
         const reservedConn = await jdbc.reserve()
         return reservedConn.conn
     };
