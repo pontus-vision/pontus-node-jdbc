@@ -123,7 +123,7 @@ const addConnectionSync = (
   };
 
   if (maxIdle) {
-    connobj["lastIdle"] = new Date().getTime();
+    connobj.lastIdle = new Date().getTime();
   }
 
   return connobj;
@@ -295,7 +295,7 @@ private async _addConnectionsOnInitialize(): Promise<void> {
           conn.conn.close();
           array.splice(i, 1);
         }
-      }
+        Type}
     }
   }
 
