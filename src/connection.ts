@@ -12,51 +12,33 @@ if (!java.isJvmCreated()) {
 }
 
 type ConnectionType = {
-  clearWarnings: (callback: (err: Error | null) => void) => void;
-  close: (callback: (err: Error | null) => void) => void;
-  commit: (callback: (err: Error | null) => void) => void;
+  clearWarnings: () => void;
+  close: () => void;
+  commit: () => void;
   createStatement: (
     arg1?: number,
     arg2?: number,
-    arg3?: number,
-    callback?: (err: Error | null, statement: any) => void
+    arg3?: number
   ) => void;
-  getAutoCommit: (
-    callback: (err: Error | null, result: boolean) => void
-  ) => void;
-  getCatalog: (callback: (err: Error | null, catalog: string) => void) => void;
-  getClientInfo: (
-    name: string,
-    callback: (err: Error | null, result: string) => void
-  ) => void;
-  getHoldability: (
-    callback: (err: Error | null, holdability: number) => void
-  ) => void;
-  getMetaData: (callback: (err: Error | null, dbm: any) => void) => void;
-  getNetworkTimeout: (
-    callback: (err: Error | null, ms: number) => void
-  ) => void;
-  getSchema: (callback: (err: Error | null, schema: string) => void) => void;
-  getTransactionIsolation: (
-    callback: (err: Error | null, txniso: number) => void
-  ) => void;
-  getTypeMap: (callback: (err: Error | null, map: any) => void) => void;
-  getWarnings: (callback: (err: Error | null, sqlwarning: any) => void) => void;
-  isClosed: (callback: (err: Error | null, closed: boolean) => void) => void;
-  isReadOnly: (
-    callback: (err: Error | null, readonly: boolean) => void
-  ) => void;
-  isValid: (
-    timeout: number,
-    callback: (err: Error | null, valid: boolean) => void
-  ) => void;
+  getAutoCommit: () => void;
+  getCatalog: () => void;
+  getClientInfo: (name: string) => void;
+  getHoldability: () => void;
+  getMetaData: () => void;
+  getNetworkTimeout: () => void;
+  getSchema: () => void;
+  getTransactionIsolation: () => void;
+  getTypeMap: () => void;
+  getWarnings: () => void;
+  isClosed: () => void;
+  isReadOnly: () => void;
+  isValid: (timeout: number) => void;
   prepareCall: (
     sql: string,
     rstype: number,
     rsconcurrency: number,
-    rsholdability: number,
-    callback: (err: Error | null, callablestatement: any) => void
-  ) => void;
+    rsholdability: number)
+     => void;
   prepareStatement: (
     sql: string,
     arg1?: Record<string, any|any[]>
@@ -65,36 +47,30 @@ type ConnectionType = {
     sql: string,
   ) => PreparedStatement;
   releaseSavepoint: (
-    savepoint: any,
-    callback: (err: Error | null) => void
+    savepoint: any
   ) => void;
-  rollback: (savepoint: any, callback: (err: Error | null) => void) => void;
+  rollback: (savepoint: any) => void;
   setAutoCommit: (
-    autocommit: boolean,
-    callback: (err: Error | null) => void
+    autocommit: boolean
   ) => void;
-  setCatalog: (catalog: string, callback: (err: Error | null) => void) => void;
+  setCatalog: (catalog: string) => void;
   setClientInfo: (
     props: any,
     name?: string,
-    value?: string,
-    callback?: (err: Error | null) => void
+    value?: string
   ) => void;
   setHoldability: (
-    holdability: number,
-    callback: (err: Error | null) => void
+    holdability: number
   ) => void;
   setReadOnly: (
-    readonly: boolean,
-    callback: (err: Error | null) => void
+    readonly: boolean
   ) => void;
-  setSavepoint: (callback: (err: Error | null) => void, name?: string) => void;
-  setSchema: (schema: string, callback: (err: Error | null) => void) => void;
+  setSavepoint: () => void;
+  setSchema: (schema: string) => void;
   setTransactionIsolation: (
-    txniso: number,
-    callback: (err: Error | null) => void
+    txniso: number
   ) => void;
-  setTypeMap: (map: any, callback: (err: Error | null) => void) => void;
+  setTypeMap: (map: any) => void;
   getAutoCommitSync:() => boolean
   getCatalogSync:() => Promise<string>
   clearWarningsSync:() => Promise<void>
