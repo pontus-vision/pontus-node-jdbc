@@ -108,8 +108,9 @@ type ConnectionType = {
   setSchemaSync(schema: string): void;
   setTransactionIsolationSync(txniso: number): void;
   setTypeMapSync(map: any): void;
-  commitSync(): Promise<void> 
+  commitSync(): Promise<void>
   createStatementSync(arg1?: number, arg2?: number, arg3?: number): Promise<any>
+  abortSync:(executor: any) => void
 };
 
 class Connection {
@@ -165,9 +166,25 @@ class Connection {
   isValidSync(val: number):boolean {
     return this.isValidSync(val)
   }
-  abort(executor: any): Promise<void> {
-    return Promise.reject(new Error("NOT IMPLEMENTED"));
+
+  asyncExecutor = (task: () => void) => {
+    setTimeout(task, 0); // Executes the task asynchronously
+  };
+
+  async abort(): Promise<void> {
+    const executor = this.asyncExecutor(() => {});
+  
+    try {
+      if (this._conn?.abortSync) {
+        await this._conn.abortSync(executor);
+      } else {
+        console.log("Abort method is not supported by this driver.");
+      }
+    } catch (error) {
+      console.error("Error aborting connection:", error);
+    }
   }
+
 
   clearWarnings(): Promise<void> {
     return new Promise((resolve, reject) => {
