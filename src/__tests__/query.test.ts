@@ -1,8 +1,7 @@
 import { beforeEach, describe, it } from "node:test";
 
 export const classPath = process.env['CLASSPATH']?.split(',');
-import Pool, { ConnObj, IConnection } from '../pool.js'
-import Connection from '../connection.js';
+import Pool, { IConnection } from '../pool.js'
 import JDBC from '../jdbc.js'; // Use default import
 import Jinst from '../jinst.js'; // Use default import
 
