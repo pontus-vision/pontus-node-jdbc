@@ -10,7 +10,7 @@ interface ConnStatus {
   uuid: string; closed: boolean; readonly?: boolean; valid?: boolean
 }
 
-export interface ConnObj {
+export interface PoolConnObj {
     uuid: string;
     conn: Connection;
     keepalive: number | boolean;
@@ -58,7 +58,7 @@ interface PoolConnStatus {
 
 const java = Jinst.getInstance();
 
-export interface IConnection extends ConnObj, Connection {}
+export interface IConnection extends PoolConnObj, Connection {}
 
 
 if (!Jinst.getInstance().isJvmCreated()) {
@@ -118,7 +118,7 @@ const addConnectionSync = (
   maxIdle: number | null
 ) => {
   const conn = dm.getConnectionSync(url, props);
-  const connobj: ConnObj = {
+  const connobj: PoolConnObj = {
     uuid: uuidv4(),
     conn: new Connection(conn),
     keepalive: ka.enabled
@@ -183,12 +183,12 @@ class Pool {
     const status: PoolStatus = {};
     status.available = this._pool.length;
     status.reserved = this._reserved.length;
-    status.pool = this.connStatus([], this._pool);
-    status.rpool = this.connStatus([], this._reserved);
+    status.pool = await this.connStatus([], this._pool);
+    status.rpool = await this.connStatus([], this._reserved);
     return status;
   }
 
-  private connStatus(acc: ConnStatus[], pool: PoolConnStatus[]): ConnStatus[] {
+  private async connStatus(acc: ConnStatus[], pool: PoolConnStatus[]): Promise<ConnStatus[]> {
     return pool.reduce((conns, connobj) => {
         const conn = connobj.conn;
         const closed = conn.isClosedSync() as boolean;
@@ -288,7 +288,7 @@ private async _addConnectionsOnInitialize(): Promise<void> {
     this.closeIdleConnectionsInArray(this._reserved, this._maxidle);
   }
 
-  private closeIdleConnectionsInArray(array: ConnObj[], maxIdle: number): void {
+  private closeIdleConnectionsInArray(array: PoolConnObj[], maxIdle: number): void {
     const time = new Date().getTime();
     const maxLastIdle = time - maxIdle;
 
@@ -304,7 +304,7 @@ private async _addConnectionsOnInitialize(): Promise<void> {
     }
   }
 
-  async release(conn: ConnObj): Promise<void> {
+  async release(conn: PoolConnObj): Promise<void> {
     if (typeof conn === "object") {
         const uuid = conn.uuid;
 
