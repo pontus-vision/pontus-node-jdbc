@@ -1,4 +1,4 @@
-import Pool, { PoolConfig } from "./pool.js";
+import Pool, { PoolConfig } from "./pool";
 
 class JDBC extends Pool {
   constructor(config: PoolConfig) {

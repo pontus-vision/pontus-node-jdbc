@@ -1,7 +1,7 @@
-import Jinst from "./jinst.js";
+import Jinst from "./jinst";
 
 
-import Connection from "./connection.js";
+import Connection from "./connection";
 const java = Jinst.getInstance();
 
 const DM = "java.sql.DriverManager";
@@ -56,7 +56,7 @@ const driverManager: DriverManager = {
 
     return new Promise((resolve, reject) => {
     
-      java.callStaticMethodSync.apply(java, [DM, "getConnection", ...args]);
+      resolve(java.callStaticMethodSync.apply(java, [DM, "getConnection", ...args]));
     });
   },
 
