@@ -1,9 +1,9 @@
 import { beforeEach, describe, it } from "node:test";
 
 export const classPath = process.env['CLASSPATH']?.split(',');
-import Pool, { IConnection } from '../pool.js'
-import JDBC from '../jdbc.js'; // Use default import
-import Jinst from '../jinst.js'; // Use default import
+import Pool, { IConnection } from '../pool'
+import JDBC from '../jdbc'; // Use default import
+import Jinst from '../jinst'; // Use default import
 
 
 describe('testing queries', ()=>{
