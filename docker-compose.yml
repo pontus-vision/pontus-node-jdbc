@@ -1,0 +1,61 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: pontus-node-jdbc-app
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_TLS_REJECT_UNAUTHORIZED: 0
+      PORT: 5000
+      JWT_SECRET_KEY: 2d49959562a7d8718d0370b09fd96d6f13b00af81fdf7d353aa96b1d975ba687
+      REFRESH_JWT_SECRET_KEY: 5875bb587efd0b6aa7d00b6b37ec210941e0c05034afcd4e8d8680137c53d2dd
+      ADMIN_PASSWORD: admin
+      USER_PASSWORD: user
+      LD_LIBRARY_PATH: /usr/lib/jvm/java-1.17.0-openjdk-amd64/lib/server:/usr/lib/jvm/java-1.17.0-openjdk-amd64/lib
+      P_DELTA_TABLE_HIVE_SERVER: jdbc:hive2://delta-db:10000 
+    volumes:
+      - .:/usr/src/app
+      - /var/run/docker.sock:/var/run/docker.sock
+    # depends_on:
+    #   - delta-db 
+    networks:
+      - app-network
+    entrypoint:
+      - /usr/bin/bash
+      - -c
+      - |
+        cd pontus-node-jdbc
+        npm install
+        cd ..
+        export CLASSPATH="$(ls /usr/src/app/src/jars/*|xargs|sed -e 's/ /,/g' )"
+        cd ../..
+
+        cd pontus-node-jdbc
+        npm run build
+        ./run-docker.sh 
+        node dist/index.js
+        # npm run jest || true
+        sleep 1000000
+        
+
+  # delta-db:
+  #   build:
+  #     context: ./delta-table/docker/
+  #     dockerfile: Dockerfile
+  #   container_name: db-setup
+  #   volumes:
+  #     - ./delta-table/run-delta-jupyterlab.sh:/usr/local/bin/db-init.sh
+  #     - ./delta-table/data:/data 
+  #     - ./delta-table/work-dir:/opt/spark/work-dir
+  #   networks:
+  #     - app-network
+  #   restart: "no"  # Ensures this runs once and exits
+  #   ports:
+  #     - "10000:10000"
+  #     - "8888:8888"
+        
+networks:
+  app-network:
+    driver: bridge
