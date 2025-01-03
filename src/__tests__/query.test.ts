@@ -22,28 +22,25 @@ describe('testing queries', ()=>{
     };
 
     async function runQuery(query:string) {
+        console.log(query)
         try {
-
             const connection = await createConnection()
-
         
             const preparedStatement = await connection.prepareStatement(query); // Replace `your_table` with your actual table name
 
             const resultSet = await preparedStatement.executeQuery();
-            console.log({resultSet})
             const results = await resultSet.toObjArray(); // Assuming you have a method to convert ResultSet to an array
-
-            
             
             // Remember to release the connection after you are done
-            await pool.release(connection);
+            // await pool.release(connection);
+            await connection.close()
             return results
         } catch (error) {
             console.error('Error executing query:', error);
         }
     }
     const pool = new Pool({
-        url: 'jdbc:hive2://delta-db:10000',   // Replace with your JDBC URL
+        url: 'jdbc:hive2://pontus-node-jdbc-delta-db:10000',   // Replace with your JDBC URL
         properties: {
         user: 'admin',           // Database username
         password: 'user'        // Database password
