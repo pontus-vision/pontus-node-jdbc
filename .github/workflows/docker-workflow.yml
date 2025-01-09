@@ -28,6 +28,10 @@ jobs:
 
       - name: Run Tests
         run: |
+          echo 'NODE VERSION'
+          node --version
+          echo 'NPM VERSION'
+          npm --version
           docker-compose exec app npm install
           docker-compose exec app npm run test src/__tests__/query.test.ts 
 
