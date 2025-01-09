@@ -1,4 +1,5 @@
-import { beforeEach, describe, it } from "node:test";
+import { beforeEach, describe, it,  } from "node:test";
+import assert from 'node:assert/strict';
 
 export const classPath = process.env['CLASSPATH']?.split(',');
 import Pool, { IConnection } from '../pool'
@@ -7,6 +8,11 @@ import Jinst from '../jinst'; // Use default import
 
 
 describe('testing queries', ()=>{
+    if (!Jinst.getInstance().isJvmCreated()) {
+            Jinst.getInstance().addOption('-Xrs');
+            Jinst.getInstance().setupClasspath(classPath || []); // Path to your JDBC driver JAR file
+    }
+
     const config= {
         url: process.env['P_DELTA_TABLE_HIVE_SERVER'] || 'jdbc:hive2://localhost:10000', // Update the connection URL according to your setup
         drivername: 'org.apache.hive.jdbc.HiveDriver', // Driver class name
@@ -68,18 +74,15 @@ describe('testing queries', ()=>{
     }
 
     beforeEach(async()=>{
-        if (!Jinst.getInstance().isJvmCreated()) {
-            Jinst.getInstance().addOption('-Xrs');
-                Jinst.getInstance().setupClasspath(classPath || []); // Path to your JDBC driver JAR file
-        }
+       await initializePool()
 
-        await initializePool()
+       const createTable = await runQuery(`DELETE FROM delta.\`/data/pv/foobar\` `)
     })
     it('should create table, insert and select',async()=>{
-       const createTable = await runQuery(`CREATE TABLE IF NOT EXISTS foo (id STRING, name STRING  ) USING DELTA LOCATION '/data/pv/foo';`)
-       const insertTable = await runQuery(`INSERT INTO foo (id , name) VALUES (1, 'foo') `)
-       const selectTalbe = await runQuery('SELECT * FROM delta.`/data/pv/foo`')
+       const createTable = await runQuery(`CREATE TABLE IF NOT EXISTS foobar (id STRING, name STRING  ) USING DELTA LOCATION '/data/pv/foobar';`)
+       const insertTable = await runQuery(`INSERT INTO delta.\`/data/pv/foobar\` (id , name) VALUES (1, 'foo')`)
+       const selectTable = await runQuery('SELECT * FROM delta.`/data/pv/foobar`')
 
-       console.log({selectTalbe})
+       assert.equal(selectTable.length, 1)
     })
 })
