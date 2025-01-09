@@ -5,7 +5,6 @@ files/spark-*
 files/bronze/**
 files/silver/**
 files/gold/**
-*.conf
 .idea/
 files/sas_token.txt
 work-dir/__pycache__/
