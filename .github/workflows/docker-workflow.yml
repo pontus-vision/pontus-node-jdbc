@@ -28,7 +28,7 @@ jobs:
 
       - name: Run Tests
         run: |
-          docker-compose exec app pytest  # Replace with your test command
+          docker-compose exec app npm run test src/__tests__/query.test.ts  # Replace with your test command
 
       - name: Tear Down
         if: always()
