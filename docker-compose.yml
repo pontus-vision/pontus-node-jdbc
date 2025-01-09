@@ -27,7 +27,7 @@ services:
       - -c
       - |
         # cd pontus-node-jdbc
-        # npm install
+        npm install
         # cd ..
         export CLASSPATH="$(ls /usr/src/app/delta-table/node/jars/*|xargs|sed -e 's/ /,/g' )"
         npm run test src/__tests__/query.test.ts
