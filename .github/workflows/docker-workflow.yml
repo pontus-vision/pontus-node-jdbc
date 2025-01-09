@@ -16,10 +16,11 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Run docker-compose
-        uses: hoverkraft-tech/compose-action@v2.0.1
-        with:
-          compose-file: "./docker-compose.yml"
+      - name: Install Docker Compose
+        run: |
+          sudo curl -L "https://github.com/docker/compose/releases/download/v2.26.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+          sudo chmod +x /usr/local/bin/docker-compose
+          docker-compose version
 
       - name: Build and Run Services with Docker Compose
         run: |
@@ -27,7 +28,8 @@ jobs:
 
       - name: Run Tests
         run: |
-          docker-compose exec app npm run test src/__tests__/query.test.ts  # Replace with your test command
+          docker-compose exec app npm run test src/__tests__/query.test.ts 
+          npm install
 
       - name: Tear Down
         if: always()
