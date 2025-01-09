@@ -28,8 +28,8 @@ jobs:
 
       - name: Run Tests
         run: |
+          docker-compose exec app npm install
           docker-compose exec app npm run test src/__tests__/query.test.ts 
-          npm install
 
       - name: Tear Down
         if: always()
