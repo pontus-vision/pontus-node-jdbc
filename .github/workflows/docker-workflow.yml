@@ -30,13 +30,8 @@ jobs:
         run: |
           echo 'APP NODE VERSION'
           docker-compose exec app node --version
-          docker-compose exec app npm rebuild
-          docker-compose exec app npm install
-          sudo chmod -R u+w /home/runner/work/pontus-node-jdbc/pontus-node-jdbc/node_modules
-          sudo chown -R $(whoami):$(whoami) /home/runner/work/pontus-node-jdbc/pontus-node-jdbc/node_modules
-          rm -rf node_modules
-          npm cache clean --force
-          npm install
+          docker-compose exec app rm -rf node_modules
+          docker-compose exec app npm cache clean --force
           docker-compose exec app npm install 
           docker-compose exec app npm list
 
