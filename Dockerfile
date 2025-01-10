@@ -1,4 +1,4 @@
-FROM node:18
+FROM node:22
 
 RUN apt update && \
     apt install -y openjdk-17-jdk openjdk-17-source 
