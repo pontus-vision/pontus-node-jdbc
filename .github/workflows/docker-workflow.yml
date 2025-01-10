@@ -30,6 +30,8 @@ jobs:
         run: |
           echo 'NPM INSTALL'
           docker-compose exec app npm install 
+          echo 'INSTALLING DEPENDENCIES WITH APT'
+          docker-compose exec app apt-get update && apt-get install -y python3 make g++ gcc
           echo 'NPM LIST'
           docker-compose exec app npm list
 
