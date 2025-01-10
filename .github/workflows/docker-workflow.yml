@@ -29,12 +29,7 @@ jobs:
       - name: Install npm packages
         run: |
           echo 'APP NODE VERSION'
-          docker-compose exec app node --version
-          echo 'REMOVING NODE MODULES'
-          docker-compose exec app rm -rf node_modules
-          echo 'NPM INSTALL'
           docker-compose exec app npm install 
-          echo 'NPM LIST'
           docker-compose exec app npm list
 
 
