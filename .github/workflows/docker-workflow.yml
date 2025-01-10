@@ -24,7 +24,7 @@ jobs:
 
       - name: Build and Run Services with Docker Compose
         run: |
-          docker-compose up -d --build app
+          docker-compose up --build app
 
       - name: Install npm packages
         run: |
