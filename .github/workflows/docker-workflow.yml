@@ -32,7 +32,8 @@ jobs:
           docker-compose exec app node --version
           docker-compose exec app npm rebuild
           docker-compose exec app npm install
-          npm list
+          docker-compose exec app npm list
+
 
       - name: Run Tests
         run: |
