@@ -34,6 +34,7 @@ jobs:
           docker-compose exec app rm -rf node_modules
           echo 'CLEANING NPM CACHE'
           docker-compose exec app npm cache clean --force
+          docker-compose exec app rm -rf /root/.npm/_cacache
           echo 'NPM INSTALL'
           docker-compose exec app npm install 
           echo 'NPM LIST'
