@@ -1,9 +1,9 @@
-import Jinst from "./jinst.js";
-import { CallableStatement } from "./callablestatement.js";
-import PreparedStatement from "./preparedstatement.js";
-import DatabaseMetaData from "./databasemetadata.js";
-import Statement from "./statement.js";
-import SQLWarning from "./sqlwarning.js";
+import Jinst from "./jinst";
+import { CallableStatement } from "./callablestatement";
+import PreparedStatement from "./preparedstatement";
+import DatabaseMetaData from "./databasemetadata";
+import Statement from "./statement";
+import SQLWarning from "./sqlwarning";
 
 const java = Jinst.getInstance();
 

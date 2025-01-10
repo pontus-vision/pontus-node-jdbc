@@ -112,7 +112,7 @@ class Jinst implements IJinst{
 
   public newInstance(className: string, ...args: any[]): Promise<any> {
     return new Promise((resolve, reject) => {
-      resolve(java.newInstance(className, ...args));
+      resolve(java.newInstanceSync(className, ...args));
     });
   }
 

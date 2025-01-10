@@ -1,4 +1,4 @@
-import PreparedStatement from "./preparedstatement.js";
+import PreparedStatement from "./preparedstatement";
 
 export class CallableStatement extends PreparedStatement {
   private _cs: any;
