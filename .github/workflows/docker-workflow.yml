@@ -26,13 +26,14 @@ jobs:
         run: |
           docker-compose up -d --build
 
+      - name: Install npm packages
+        run: |
+          echo 'APP NODE VERSION'
+          docker-compose exec app node --version
+          docker-compose exec app npm install
+
       - name: Run Tests
         run: |
-          echo 'NODE VERSION'
-          node --version
-          echo 'NPM VERSION'
-          npm --version
-          docker-compose exec app npm install
           docker-compose exec app npm run test src/__tests__/query.test.ts 
 
       - name: Tear Down
