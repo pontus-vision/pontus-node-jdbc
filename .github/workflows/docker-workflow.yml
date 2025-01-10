@@ -33,8 +33,8 @@ jobs:
           echo 'REMOVING NODE MODULES'
           docker-compose exec app rm -rf node_modules
           echo 'CLEANING NPM CACHE'
-          docker-compose exec app npm cache clean --force
           docker-compose exec app rm -rf /root/.npm/_cacache
+          docker-compose exec app npm cache clean --force
           echo 'NPM INSTALL'
           docker-compose exec app npm install 
           echo 'NPM LIST'
