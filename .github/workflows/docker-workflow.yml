@@ -30,6 +30,7 @@ jobs:
         run: |
           echo 'REMOVING NODE MODULES'
           docker-compose exec app rm -rf node_modules
+          docker-compose exec app rm -rf package-lock.json
           echo 'NPM INSTALL'
           docker-compose exec app npm install 
           echo 'NPM LIST'
