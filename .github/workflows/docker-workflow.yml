@@ -31,7 +31,6 @@ jobs:
           echo 'APP NODE VERSION'
           docker-compose exec app node --version
           docker-compose exec app npm rebuild
-          docker-compose exec app npm install
           docker-compose exec app npm list
 
 
