@@ -43,12 +43,7 @@ jobs:
           echo 'exporting CLASSPATH'
           echo 'CLASSPATH OUTPUT:'
           docker-compose exec app sh -c 'export CLASSPATH="$(ls /usr/src/app/delta-table/node/jars/*|xargs|sed -e "s/ /,/g")" && echo $CLASSPATH'
-          echo 'REMOVING NODE MODULES'
-          docker-compose exec app rm -rf node_modules
-          echo 'REBUILDING WITH NODE-GYP'
-          docker-compose exec app npm rebuild node-gyp
-          echo 'REMOVING SYMLINK'
-          rm -rf /usr/src/app/node_modules/java/build/node_gyp_bins/python3
+          
           echo 'INSTALLING NPM PACKAGES'
           docker-compose exec app npm install
           echo 'GETENT HOSTS'
