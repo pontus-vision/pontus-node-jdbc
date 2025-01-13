@@ -28,14 +28,15 @@ jobs:
 
       - name: Run Tests
         run: |
+
           echo 'NODE VERSION'
           docker-compose exec app node --version
           echo 'NPM VERSION'
           docker-compose exec app npm --version
           echo 'exporting CLASSPATH'
-          export CLASSPATH="$(ls /usr/src/app/delta-table/node/jars/*|xargs|sed -e 's/ /,/g' )"
+          docker-compose exec app export CLASSPATH="$(ls /usr/src/app/delta-table/node/jars/*|xargs|sed -e 's/ /,/g' )"
           echo 'CLASSPATH OUTPUT:'
-          echo $CLASSPATH
+          docker-compose exec app echo $CLASSPATH
           echo 'REMOVING NODE MODULES'
           docker-compose exec app rm -rf node_modules
           echo 'REBUILDING WITH NODE-GYP'
