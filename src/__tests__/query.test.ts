@@ -74,7 +74,7 @@ describe('testing queries', ()=>{
     }
 
     beforeEach(async()=>{
-       await initializePool()
+    //    await initializePool()
 
        const createTable = await runQuery(`DELETE FROM delta.\`/data/pv/foobar\` `)
     })
