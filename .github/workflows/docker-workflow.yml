@@ -41,9 +41,9 @@ jobs:
           echo 'TRYING TO PRINT DELTA-TABLE JARS FILES'
           docker-compose exec app ls delta-table/node/jars
           echo 'exporting CLASSPATH'
-          docker-compose exec app ./run-node.sh
+          eocker-compose exec app 
           echo 'CLASSPATH OUTPUT:'
-          docker-compose exec app echo $CLASSPATH
+          docker-compose exec app sh -c './run-node.sh && echo $CLASSPATH'
           echo 'REMOVING NODE MODULES'
           docker-compose exec app rm -rf node_modules
           echo 'REBUILDING WITH NODE-GYP'
