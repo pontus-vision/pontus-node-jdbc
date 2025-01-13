@@ -15,9 +15,9 @@ services:
       USER_PASSWORD: user
       LD_LIBRARY_PATH: /usr/lib/jvm/java-1.17.0-openjdk-amd64/lib/server:/usr/lib/jvm/java-1.17.0-openjdk-amd64/lib
       P_DELTA_TABLE_HIVE_SERVER: jdbc:hive2://node-pontus-jdbc-db-setup:10000 
-    volumes:
-      - .:/usr/src/app
-      - /var/run/docker.sock:/var/run/docker.sock
+    # volumes:
+    #   - .:/usr/src/app
+    #   - /var/run/docker.sock:/var/run/docker.sock
     # depends_on:
     #   - delta-db 
     networks:
