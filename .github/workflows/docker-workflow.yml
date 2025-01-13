@@ -32,8 +32,11 @@ jobs:
           node --version
           echo 'NPM VERSION'
           npm --version
+          echo 'REMOVING NODE MODULES'
           docker-compose exec app rm -rf node_modules
+          echo 'INSTALLING NPM PACKAGES'
           docker-compose exec app npm install
+          echo 'RUNNING TESTS'
           docker-compose exec app npm run test src/__tests__/query.test.ts 
 
       - name: Tear Down
