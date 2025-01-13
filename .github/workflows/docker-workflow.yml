@@ -24,7 +24,7 @@ jobs:
 
       - name: Build and Run Services with Docker Compose
         run: |
-          docker-compose up app -d --build
+          docker-compose up -d --build
 
       - name: Run Tests
         run: |
