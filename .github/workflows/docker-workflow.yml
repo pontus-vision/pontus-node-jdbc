@@ -42,7 +42,7 @@ jobs:
           docker-compose exec app ls delta-table/node/jars
           echo 'exporting CLASSPATH'
           echo 'CLASSPATH OUTPUT:'
-          docker-compose exec app sh -c './run-node.sh && echo $CLASSPATH'
+          docker-compose exec app sh -c 'export CLASSPATH="$(ls /usr/src/app/delta-table/node/jars/*|xargs|sed -e "s/ /,/g")" && echo $CLASSPATH'
           echo 'REMOVING NODE MODULES'
           docker-compose exec app rm -rf node_modules
           echo 'REBUILDING WITH NODE-GYP'
