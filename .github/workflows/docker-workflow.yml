@@ -33,6 +33,8 @@ jobs:
           docker-compose exec app node --version
           echo 'NPM VERSION'
           docker-compose exec app npm --version
+          echo 'PWD:'
+          docker-compose exec app pwd
           echo 'exporting CLASSPATH'
           docker-compose exec app export CLASSPATH="$(ls /usr/src/app/delta-table/node/jars/*|xargs|sed -e 's/ /,/g' )"
           echo 'CLASSPATH OUTPUT:'
