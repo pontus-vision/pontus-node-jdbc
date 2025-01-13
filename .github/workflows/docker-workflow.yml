@@ -33,12 +33,8 @@ jobs:
           echo 'NPM VERSION'
           npm --version
           echo 'REMOVING NODE MODULES'
-<<<<<<< HEAD
-          docker-compose exec docker-compose exec app rm -rf node_modules
-=======
           docker-compose exec app rm -rf node_modules
->>>>>>> d9eba5b1adb8a9c0e1914a27d4b9b63f95c28134
-          npm rebuild node-gyp
+          docker-compose exec app npm rebuild node-gyp
           echo 'REBUILDING WITH NODE-GYP'
           echo 'INSTALLING NPM PACKAGES'
           docker-compose exec app npm install
