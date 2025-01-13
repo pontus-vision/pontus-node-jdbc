@@ -38,6 +38,8 @@ jobs:
           docker-compose exec app pwd
           echo 'LISTING DIR:'
           docker-compose exec app ls
+          echo 'TRYING TO PRINT DELTA-TABLE JARS FILES'
+          docker-compose exec app ls delta-table/node/jars
           echo 'exporting CLASSPATH'
           docker-compose exec app export CLASSPATH="$(ls /usr/src/app/delta-table/node/jars/*|xargs|sed -e 's/ /,/g' )"
           echo 'CLASSPATH OUTPUT:'
