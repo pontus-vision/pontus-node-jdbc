@@ -24,15 +24,14 @@ jobs:
 
       - name: Build and Run Services with Docker Compose
         run: |
-          docker-compose -f docker-compose.yml up --build --abort-on-container-exit --exit-code-from app
           echo 'LIST'
           docker-compose exec app ls
           echo 'PWD'
           docker-compose exec app pwd
           echo 'CLASSPATH'
           docker-compose exec app echo $CLASSPATH
+          docker-compose -f docker-compose.yml up --build --abort-on-container-exit --exit-code-from app
           
-
       - name: Tear Down
         if: always()
         run: |
