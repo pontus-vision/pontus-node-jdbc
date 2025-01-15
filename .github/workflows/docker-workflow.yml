@@ -24,6 +24,7 @@ jobs:
 
       - name: Build and Run Services with Docker Compose
         run: |
+          docker-compose up --build app
           echo 'LIST'
           docker-compose exec app ls
           echo 'PWD'
