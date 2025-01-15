@@ -26,12 +26,15 @@ services:
       - /bin/bash
       - -c
       - |
+        sleep 5
         # cd pontus-node-jdbc
         npm install
         # cd ..
         echo 'Exporting in shell'
         export CLASSPATH="$(ls /usr/src/app/delta-table/node/jars/*|xargs|sed -e 's/ /,/g' )"
         ls /usr/src/app/delta-table/node/jars/ 
+        echo 'ECHOING CLASSPATH'
+        echo $CLASSPATH
         npm run test src/__tests__/query.test.ts
         # cd ../..
         # cd pontus-node-jdbc
@@ -39,7 +42,7 @@ services:
         # ./run-docker.sh 
         # node dist/index.js
         # npm run jest || true
-        sleep 1000000
+        # sleep 1000000
         
 
   delta-db:
