@@ -10,8 +10,3 @@ RUN chmod +x /usr/local/lib/node_modules/java && \
     npm rebuild
 
 WORKDIR /usr/src/app
-
-COPY package*.json ./
-RUN npm install
-
-COPY . .

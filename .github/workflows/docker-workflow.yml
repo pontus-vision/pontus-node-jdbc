@@ -26,30 +26,6 @@ jobs:
         run: |
           docker-compose up -d --build
 
-      - name: Run Tests
-        run: |
-          echo 'LS AZURE INSTANCE'
-          ls
-          echo 'NODE VERSION'
-          docker-compose exec app node --version
-          echo 'NPM VERSION'
-          docker-compose exec app npm --version
-          echo 'PWD:'
-          docker-compose exec app pwd
-          echo 'LISTING DIR:'
-          docker-compose exec app ls
-          echo 'TRYING TO PRINT DELTA-TABLE JARS FILES'
-          docker-compose exec app ls delta-table/node/jars
-          echo 'exporting CLASSPATH'
-          echo 'CLASSPATH OUTPUT:'
-          docker-compose exec app sh -c 'export CLASSPATH="$(ls /usr/src/app/delta-table/node/jars/*|xargs|sed -e "s/ /,/g")" && echo $CLASSPATH'
-          
-          echo 'INSTALLING NPM PACKAGES'
-          docker-compose exec app npm install
-          echo 'GETENT HOSTS'
-          docker-compose exec app getent hosts node-pontus-jdbc-db-setup
-          echo 'RUNNING TESTS'
-          docker-compose exec app sh -c 'export CLASSPATH="$(ls /usr/src/app/delta-table/node/jars/*|xargs|sed -e "s/ /,/g")" && echo $CLASSPATH && npm run test src/__tests__/query.test.ts'
 
       - name: Tear Down
         if: always()
