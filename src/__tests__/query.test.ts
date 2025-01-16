@@ -1,10 +1,12 @@
-import { beforeEach, describe, it,  } from "node:test";
+import { after, beforeEach, describe, it,  } from "node:test";
 import assert from 'node:assert/strict';
 
 export const classPath = process.env['CLASSPATH']?.split(',');
 import Pool, { IConnection } from '../pool'
 import JDBC from '../jdbc'; // Use default import
 import Jinst from '../jinst'; // Use default import
+import ResultSet from "../resultset";
+import { exit, exitCode } from "node:process";
 
 
 describe('testing queries', ()=>{
@@ -40,6 +42,8 @@ describe('testing queries', ()=>{
             // Remember to release the connection after you are done
             // await pool.release(connection);
             await connection.close()
+            
+        
             return results
         } catch (error) {
             console.error('Error executing query:', error);
@@ -77,6 +81,10 @@ describe('testing queries', ()=>{
     //    await initializePool()
 
        const createTable = await runQuery(`DELETE FROM delta.\`/data/pv/foobar\` `)
+    })
+
+    after(async()=>{
+        exit()
     })
     it('should create table, insert and select',async()=>{
        const createTable = await runQuery(`CREATE TABLE IF NOT EXISTS foobar (id STRING, name STRING  ) USING DELTA LOCATION '/data/pv/foobar';`)
