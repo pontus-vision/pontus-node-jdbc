@@ -26,7 +26,8 @@ services:
       - /bin/bash
       - -c
       - |
-        sleep 10
+        echo "Checking if service is up on port 10080..."
+        timeout 22 sh -c 'until nc -z $0 $1; do sleep 1; done' delta-db 10000
         # cd pontus-node-jdbc
         npm install
         # cd ..
@@ -38,7 +39,7 @@ services:
         # ./run-docker.sh 
         # node dist/index.js
         # npm run jest || true
-        # sleep 1000000
+        #sleep 1000000
         
 
   delta-db:
@@ -57,7 +58,11 @@ services:
     ports:
       - "10000:10000"
       - "8888:8888"
-        
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:10000"] # Adjust to a valid healthcheck for your service
+      interval: 10s
+      timeout: 5s
+      retries: 5 
 networks:
   app-network:
     driver: bridge
