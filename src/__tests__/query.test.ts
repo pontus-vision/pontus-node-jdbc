@@ -32,40 +32,17 @@ describe('testing queries', ()=>{
     async function runQuery(query:string) {
         console.log(query)
         try {
-            // const connection = await createConnection()
+            const connection = await createConnection()
 
         
-            // const preparedStatement = await connection.prepareStatement(query); // Replace `your_table` with your actual table name
-
-            // const resultSet = await preparedStatement.executeQuery();
-            // const results = await resultSet.toObjArray(); // Assuming you have a method to convert ResultSet to an array
-            
-            // // Remember to release the connection after you are done
-            // // await pool.release(connection);
-            // await connection.close()
-            
-            const connection = (await pool.reserve()).conn;
-
-            // Example: running a query
             const preparedStatement = await connection.prepareStatement(query); // Replace `your_table` with your actual table name
 
             const resultSet = await preparedStatement.executeQuery();
             const results = await resultSet.toObjArray(); // Assuming you have a method to convert ResultSet to an array
-
-            console.log('Query Results:', results);
             
-            // Release the connection back to the pool
-            await pool.release(connection);
-
-        
-            // const preparedStatement = await connection.prepareStatement(query); // Replace `your_table` with your actual table name
-
-            // const resultSet = await preparedStatement.executeQuery();
-            // const results = await resultSet.toObjArray(); // Assuming you have a method to convert ResultSet to an array
-            
-            // // Remember to release the connection after you are done
-            // // await pool.release(connection);
-            // await connection.close()
+            // Remember to release the connection after you are done
+            // await pool.release(connection);
+            await connection.close()
         
             return results
         } catch (error) {
