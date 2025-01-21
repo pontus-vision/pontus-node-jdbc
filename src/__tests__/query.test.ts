@@ -32,17 +32,40 @@ describe('testing queries', ()=>{
     async function runQuery(query:string) {
         console.log(query)
         try {
-            const connection = await createConnection()
+            // const connection = await createConnection()
+
         
+            // const preparedStatement = await connection.prepareStatement(query); // Replace `your_table` with your actual table name
+
+            // const resultSet = await preparedStatement.executeQuery();
+            // const results = await resultSet.toObjArray(); // Assuming you have a method to convert ResultSet to an array
+            
+            // // Remember to release the connection after you are done
+            // // await pool.release(connection);
+            // await connection.close()
+            
+            const connection = (await pool.reserve()).conn;
+
+            // Example: running a query
             const preparedStatement = await connection.prepareStatement(query); // Replace `your_table` with your actual table name
 
             const resultSet = await preparedStatement.executeQuery();
             const results = await resultSet.toObjArray(); // Assuming you have a method to convert ResultSet to an array
+
+            console.log('Query Results:', results);
             
-            // Remember to release the connection after you are done
-            // await pool.release(connection);
-            await connection.close()
+            // Release the connection back to the pool
+            await pool.release(connection);
+
+        
+            // const preparedStatement = await connection.prepareStatement(query); // Replace `your_table` with your actual table name
+
+            // const resultSet = await preparedStatement.executeQuery();
+            // const results = await resultSet.toObjArray(); // Assuming you have a method to convert ResultSet to an array
             
+            // // Remember to release the connection after you are done
+            // // await pool.release(connection);
+            // await connection.close()
         
             return results
         } catch (error) {
@@ -50,7 +73,7 @@ describe('testing queries', ()=>{
         }
     }
     const pool = new Pool({
-        url: 'jdbc:hive2://pontus-node-jdbc-delta-db:10000',   // Replace with your JDBC URL
+        url: 'jdbc:hive2://node-pontus-jdbc-db-setup:10000',   // Replace with your JDBC URL
         properties: {
         user: 'admin',           // Database username
         password: 'user'        // Database password
@@ -90,6 +113,8 @@ describe('testing queries', ()=>{
        const createTable = await runQuery(`CREATE TABLE IF NOT EXISTS foobar (id STRING, name STRING  ) USING DELTA LOCATION '/data/pv/foobar';`)
        const insertTable = await runQuery(`INSERT INTO delta.\`/data/pv/foobar\` (id , name) VALUES (1, 'foo')`)
        const selectTable = await runQuery('SELECT * FROM delta.`/data/pv/foobar`')
+
+       console.log({selectTable: selectTable.length})
 
        assert.equal(selectTable.length, 1)
     })
