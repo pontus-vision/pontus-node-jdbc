@@ -1,0 +1,32 @@
+name: Docker Compose Workflow
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test-with-docker-compose:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Install Docker Compose
+        run: |
+          sudo curl -L "https://github.com/docker/compose/releases/download/v2.26.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+          sudo chmod +x /usr/local/bin/docker-compose
+          docker-compose version
+
+      - name: Build and Run Services with Docker Compose
+        run: |
+          docker-compose up --build --abort-on-container-exit --exit-code-from app
+          
+      - name: Tear Down
+        if: always()
+        run: |
+          docker-compose down

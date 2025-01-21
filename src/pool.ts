@@ -1,9 +1,9 @@
 import { v4 as uuidv4 } from "uuid";
 import * as console from "console";
-import Jinst from "./jinst.js";
-import dm from "./drivermanager.js";
-import Connection from "./connection.js";
-import Statement from "./statement.js";
+import Jinst from "./jinst";
+import dm from "./drivermanager";
+import Connection from "./connection";
+import Statement from "./statement";
 import { ConnectOpts } from "net";
 
 interface ConnStatus {
@@ -13,7 +13,7 @@ interface ConnStatus {
 export interface PoolConnObj {
     uuid: string;
     conn: Connection;
-    keepalive: number | boolean;
+    keepalive: number | false | NodeJS.Timeout;
     lastIdle: number | undefined ;
   }
 
