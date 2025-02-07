@@ -83,6 +83,8 @@ describe('testing queries', ()=>{
        const insertTable = await runQuery(`INSERT INTO delta.\`/data/pv/foobar\` (id , name) VALUES (1, 'foo')`)
        const selectTable = await runQuery('SELECT * FROM delta.`/data/pv/foobar`')
 
+       console.log({selectTable})
+
        assert.equal(selectTable.length, 1)
     })
 })
