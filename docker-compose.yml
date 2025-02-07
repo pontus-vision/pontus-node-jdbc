@@ -48,7 +48,6 @@ services:
     container_name: node-pontus-jdbc-db-setup
 
     volumes:
-      - ./delta-table/run-delta-jupyterlab.sh:/usr/local/bin/db-init.sh
       - ./delta-table/data:/data 
       - ./delta-table/work-dir:/opt/spark/work-dir
     networks:
