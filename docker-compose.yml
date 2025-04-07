@@ -26,6 +26,8 @@ services:
       - /bin/bash
       - -c
       - |
+        echo "Checking netstat"
+        netstat --version
         echo "Checking if service is up on port 10080..."
         timeout 22 sh -c 'until nc -z $0 $1; do sleep 1; done' delta-db 10000
         # cd pontus-node-jdbc
