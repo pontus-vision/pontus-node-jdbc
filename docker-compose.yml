@@ -26,6 +26,9 @@ services:
       - /bin/bash
       - -c
       - |
+        apt install -y net-tools
+        echo "Checking netstat"
+        netstat --version
         echo "Checking if service is up on port 10080..."
         timeout 22 sh -c 'until nc -z $0 $1; do sleep 1; done' delta-db 10000
         # cd pontus-node-jdbc
@@ -48,7 +51,6 @@ services:
     container_name: node-pontus-jdbc-db-setup
 
     volumes:
-      - ./delta-table/run-delta-jupyterlab.sh:/usr/local/bin/db-init.sh
       - ./delta-table/data:/data 
       - ./delta-table/work-dir:/opt/spark/work-dir
     networks:
