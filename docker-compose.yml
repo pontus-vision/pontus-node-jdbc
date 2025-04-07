@@ -26,6 +26,7 @@ services:
       - /bin/bash
       - -c
       - |
+        apt install -y net-tools
         echo "Checking netstat"
         netstat --version
         echo "Checking if service is up on port 10080..."
